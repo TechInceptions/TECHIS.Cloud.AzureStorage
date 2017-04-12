@@ -12,6 +12,7 @@
     <PackageProjectUrl>http://techinceptions.com/</PackageProjectUrl>
     <RepositoryUrl>https://github.com/TechInceptions/TECHIS.Cloud.AzureStorage</RepositoryUrl>
     <PackageTags>Azure Storage File API Simple Techis</PackageTags>
+    <Product>SAFAS: Simple API for Azure Storage</Product>
   </PropertyGroup>
 
   <ItemGroup>
