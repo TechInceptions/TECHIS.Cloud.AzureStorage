@@ -1,18 +1,11 @@
 ﻿
 using System;
-
 using System.Diagnostics;
-
 using System.Net;
-
 using System.Threading;
-
 using System.Threading.Tasks;
-
 using Microsoft.WindowsAzure.Storage;
-
 using Microsoft.WindowsAzure.Storage.Blob;
-
 using Microsoft.WindowsAzure.Storage.RetryPolicies;
 using System.Text;
 
@@ -20,9 +13,12 @@ namespace TECHIS.Cloud.AzureStorage
 {
     public  class BlobLeaseAgent:BlobAccess
     {
+        #region Fields 
         private CloudPageBlob _LeaseBlob;
         private readonly string _LeaseBlobName;
         private readonly int _LeaseDurationSeconds;
+        #endregion
+
         #region Connect 
 
         public new BlobLeaseAgent Connect(string containerUri, Encoding encoding = null)
@@ -46,11 +42,18 @@ namespace TECHIS.Cloud.AzureStorage
         }
         #endregion
 
-
+        #region Constructors 
         public BlobLeaseAgent(string leaseBlobName, int leaseDurationSeconds)
         {
             _LeaseBlobName = leaseBlobName;
             _LeaseDurationSeconds = leaseDurationSeconds;
+        }
+        #endregion
+
+        #region Public Methods 
+        public static BlobLeaseAgent Get(string leaseBlobName, int leaseDurationSeconds, string containerUri)
+        {
+            return (new BlobLeaseAgent(leaseBlobName, leaseDurationSeconds)).Connect(containerUri);
         }
 
         public async Task ReleaseLeaseAsync(string leaseId)
@@ -106,35 +109,23 @@ namespace TECHIS.Cloud.AzureStorage
         }
 
         public async Task<bool> RenewLeaseAsync(string leaseId, CancellationToken token)
-
         {
-
             try
-
             {
-
                 await _LeaseBlob.RenewLeaseAsync(new AccessCondition { LeaseId = leaseId },null,null, token);
-
                 return true;
-
             }
 
             catch (StorageException storageException)
-
             {
-
                 // catch (WebException webException)
-
                 Trace.TraceError(storageException.Message);
-
-
-
                 return false;
-
             }
-
         }
+        #endregion
 
+        #region Private Methods 
         private async Task CreateBlobAsync()
         {
             /* Container must already exist
@@ -161,5 +152,6 @@ namespace TECHIS.Cloud.AzureStorage
                 }
             }
         }
+        #endregion
     }
 }

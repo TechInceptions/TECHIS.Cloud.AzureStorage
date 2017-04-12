@@ -2,6 +2,16 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard1.6</TargetFramework>
+    <Description>Simple API for Azure Storage</Description>
+    <Version>0.2.0</Version>
+    <PackageReleaseNotes>1st NET Standard Library release</PackageReleaseNotes>
+    <Authors>TECH-IS, Arinze</Authors>
+    <Company>TECH-IS INC.</Company>
+    <Copyright>TECH-IS INC. 2017</Copyright>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <PackageProjectUrl>http://techinceptions.com/</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/TechInceptions/TECHIS.Cloud.AzureStorage</RepositoryUrl>
+    <PackageTags>Azure Storage File API Simple Techis</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>

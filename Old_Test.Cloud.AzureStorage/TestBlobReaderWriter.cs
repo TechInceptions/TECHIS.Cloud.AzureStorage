@@ -112,7 +112,7 @@ namespace Test.Cloud.AzureStorage
             BlobWriter br = new BlobWriter();
             string containerUri = Connector.GetContainerUri();
             var fileName = "l1/l3";
-            byte[] data = System.Text.Encoding.UTF8.GetBytes($"Test data: {DateTime.UtcNow.ToString() }");
+            byte[] data = System.Text.Encoding.UTF8.GetBytes($"Test data: {DateTime.UtcNow.ToLongTimeString()}");
             var task = br.Connect(containerUri).WriteToBlobAsync(data, fileName);
             task.Wait();
             Assert.IsTrue(task.IsCompleted, "Failed to Write Async blob file");
@@ -122,7 +122,7 @@ namespace Test.Cloud.AzureStorage
         {
             BlobWriter br = new BlobWriter();
             var fileName = "l1/l3";
-            byte[] data = System.Text.Encoding.UTF8.GetBytes($"Test data: {DateTime.UtcNow.ToString()}");
+            byte[] data = System.Text.Encoding.UTF8.GetBytes($"Test data: {DateTime.UtcNow.ToLongTimeString()}");
             var task = br.Connect(Connector.StorageConnectionString, "test").WriteToBlobAsync(data, fileName);
             task.Wait();
             Assert.IsTrue(task.IsCompleted, "Failed to Write Async blob file");

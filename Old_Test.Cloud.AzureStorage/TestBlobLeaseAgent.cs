@@ -37,11 +37,9 @@ namespace Test.Cloud.AzureStorage
             Assert.IsTrue(string.IsNullOrEmpty(errorMessage));
             Assert.IsTrue(hasLease);
 
-            if (hasLease)
-            {
-                var task = bla.ReleaseLeaseAsync(leaseId);
-                task.Wait();
-            }
+            if(hasLease)
+                bla.ReleaseLease(leaseId);
+
         }
 
     }
