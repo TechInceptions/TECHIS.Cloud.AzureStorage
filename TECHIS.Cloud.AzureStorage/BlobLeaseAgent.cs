@@ -65,7 +65,7 @@ namespace TECHIS.Cloud.AzureStorage
             catch (StorageException e)
             {
                 // Lease will eventually be released.
-                Trace.TraceError(e.Message);
+                //Trace.TraceError(e.Message);
             }
         }
 
@@ -78,7 +78,7 @@ namespace TECHIS.Cloud.AzureStorage
             }
             catch (StorageException storageException)
             {
-                Trace.TraceError(storageException.Message);
+                //Trace.TraceError(storageException.Message);
                 if (storageException.InnerException is WebException webException)
                 {
                     if (webException.Response is HttpWebResponse response)
@@ -119,7 +119,7 @@ namespace TECHIS.Cloud.AzureStorage
             catch (StorageException storageException)
             {
                 // catch (WebException webException)
-                Trace.TraceError(storageException.Message);
+                //Trace.TraceError(storageException.Message);
                 return false;
             }
         }

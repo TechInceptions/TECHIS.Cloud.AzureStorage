@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard1.6</TargetFramework>
+    <TargetFramework>netstandard1.5</TargetFramework>
     <Description>Simple API for Azure Storage</Description>
-    <Version>0.2.0</Version>
-    <PackageReleaseNotes>1st NET Standard Library release</PackageReleaseNotes>
+    <Version>0.2.1</Version>
+    <PackageReleaseNotes>release for .NET Standard Library 1.5</PackageReleaseNotes>
     <Authors>TECH-IS, Arinze</Authors>
     <Company>TECH-IS INC.</Company>
     <Copyright>TECH-IS INC. 2017</Copyright>
@@ -16,10 +16,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Diagnostics.EventFlow.Inputs.Trace" Version="1.1.0" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.2" />
     <PackageReference Include="System.Net.Requests" Version="4.3.0" />
-    <PackageReference Include="TECHIS.Core" Version="4.0.0" />
+    <PackageReference Include="TECHIS.Core" Version="4.0.3" />
     <PackageReference Include="WindowsAzure.Storage" Version="8.1.1" />
   </ItemGroup>
 
