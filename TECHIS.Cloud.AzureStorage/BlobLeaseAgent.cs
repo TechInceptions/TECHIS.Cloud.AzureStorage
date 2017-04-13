@@ -69,12 +69,22 @@ namespace TECHIS.Cloud.AzureStorage
             }
         }
 
-        public async Task<string> AcquireLeaseAsync(CancellationToken token)
+        /// <summary>
+        /// 15 seconds is the min allowed
+        /// </summary>
+        private const int MIN_LEASEDURATION = 15;
+        public async Task<string> AcquireLeaseAsync(CancellationToken token, int? leaseDurationSeconds = null, string reAcquireLeaseId = null)
         {
             bool blobNotFound = false;
             try
             {
-                return await _LeaseBlob.AcquireLeaseAsync(TimeSpan.FromSeconds(_LeaseDurationSeconds), null, null, null, null, token);
+                int lds = leaseDurationSeconds ?? _LeaseDurationSeconds;
+                if (lds<MIN_LEASEDURATION)
+                {
+                    lds = MIN_LEASEDURATION;
+                }
+                AccessCondition ac = string.IsNullOrEmpty(reAcquireLeaseId) ? null : AccessCondition.GenerateLeaseCondition(reAcquireLeaseId);
+                return await _LeaseBlob.AcquireLeaseAsync(TimeSpan.FromSeconds(lds), reAcquireLeaseId, ac, null, null, token);
             }
             catch (StorageException storageException)
             {

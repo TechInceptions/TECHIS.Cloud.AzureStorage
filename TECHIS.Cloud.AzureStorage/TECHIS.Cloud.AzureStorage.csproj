@@ -9,7 +9,7 @@
     <Company>TECH-IS INC.</Company>
     <Copyright>TECH-IS INC. 2017</Copyright>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <PackageProjectUrl>http://techinceptions.com/</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/TechInceptions/TECHIS.Cloud.AzureStorage</PackageProjectUrl>
     <RepositoryUrl>https://github.com/TechInceptions/TECHIS.Cloud.AzureStorage</RepositoryUrl>
     <PackageTags>Azure Storage File API Simple Techis</PackageTags>
     <Product>SAFAS: Simple API for Azure Storage</Product>

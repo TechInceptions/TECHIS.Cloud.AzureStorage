@@ -15,21 +15,23 @@ namespace Test.Cloud.AzureStorage
         [TestMethod]
         public void TestAcquireLease()
         {
-            string errorMessage = null ;
+            string errorMessage = null;
             string leaseName = "testleasesc3";
             int durationSeconds = 15;
-            var cts = new CancellationTokenSource();
 
             BlobLeaseAgent bla = (new BlobLeaseAgent(leaseName, durationSeconds)).Connect(Connector.GetContainerUri());
 
             string leaseId = null;
-            try
+            using (var cts = new CancellationTokenSource())
             {
-                leaseId = bla?.AcquireLeaseAsync(cts.Token).Result;
-            }
-            catch (Exception xc)
-            {
-                errorMessage = xc.Message;
+                try
+                {
+                    leaseId = bla?.AcquireLeaseAsync(cts.Token).Result;
+                }
+                catch (Exception xc)
+                {
+                    errorMessage = xc.Message;
+                }
             }
 
             bool hasLease = !string.IsNullOrEmpty(leaseId);
@@ -43,6 +45,44 @@ namespace Test.Cloud.AzureStorage
                 task.Wait();
             }
         }
+        [TestMethod]
+        public void TestReAcquireLease()
+        {
+            string errorMessage = null;
+            string leaseName = "testleasesc3";
+            int durationSeconds = 22;
+            int renewCount = 3;
 
+            BlobLeaseAgent bla = (new BlobLeaseAgent(leaseName, durationSeconds)).Connect(Connector.GetContainerUri());
+
+            string leaseId = null;
+            using (var cts = new CancellationTokenSource())
+            {
+                try
+                {
+                    leaseId = bla?.AcquireLeaseAsync(cts.Token).Result;
+                }
+                catch (Exception xc)
+                {
+                    errorMessage = xc.Message;
+                }
+
+                for (int i = 0; i < renewCount; i++)
+                {
+                    leaseId = bla.AcquireLeaseAsync(cts.Token, durationSeconds, leaseId).Result;
+                    Thread.Sleep((durationSeconds - 5) * 1000);
+                }
+            }
+
+            bool hasLease = !string.IsNullOrEmpty(leaseId);
+
+            Assert.IsTrue(string.IsNullOrEmpty(errorMessage));
+            Assert.IsTrue(hasLease);
+
+            if (hasLease)
+            {
+                bla.ReleaseLeaseAsync(leaseId).Wait();
+            }
+        }
     }
 }
