@@ -16,7 +16,7 @@ namespace Test.Cloud.AzureStorage
         /// <summary>
         /// Needs rights to create a container
         /// </summary>
-        public static string StorageConnectionString => "SharedAccessSignature=sv=2015-12-11&ss=b&srt=co&sp=rwdl&st=2017-02-10T13%3A33%3A00Z&se=2017-04-14T12%3A33%3A00Z&sig=oKS5Is5YupWrTnBh2jB1DMpulaA4VN72m85ZzHEaBFQ%3D;BlobEndpoint=https://tests4dev.blob.core.windows.net/";
+        public static string StorageConnectionString => "SharedAccessSignature=sv=2016-05-31&ss=b&srt=sco&sp=rwdlacu&st=2017-04-19T19%3A56%3A00Z&se=2019-08-31T19%3A56%3A00Z&sig=Z6q6gHRrC%2FmhUHzbQqM74RNPrmBTEa7Wp1BMVN4hsKQ%3D;BlobEndpoint=https://tests4dev.blob.core.windows.net/";
 
     }
 }

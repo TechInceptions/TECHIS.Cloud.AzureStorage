@@ -36,8 +36,8 @@ namespace Test.Cloud.AzureStorage
 
             bool hasLease = !string.IsNullOrEmpty(leaseId);
 
-            Assert.IsTrue(string.IsNullOrEmpty(errorMessage));
-            Assert.IsTrue(hasLease);
+            Assert.IsTrue(string.IsNullOrEmpty(errorMessage), $"has error:{Environment.NewLine}{errorMessage}");
+            Assert.IsTrue(hasLease, "Lease was not acquired");
 
             if (hasLease)
             {

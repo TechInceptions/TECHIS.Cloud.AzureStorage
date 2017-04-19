@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard1.5</TargetFramework>
+    <TargetFrameworks>netstandard1.5;netstandard1.6</TargetFrameworks>
     <Description>Simple API for Azure Storage</Description>
-    <Version>0.2.2</Version>
-    <PackageReleaseNotes>release for .NET Standard Library 1.5</PackageReleaseNotes>
+    <Version>0.2.3</Version>
+    <PackageReleaseNotes>Release for .NET Standard Library 1.5 and 1.6</PackageReleaseNotes>
     <Authors>TECH-IS, Arinze</Authors>
     <Company>TECH-IS INC.</Company>
     <Copyright>TECH-IS INC. 2017</Copyright>

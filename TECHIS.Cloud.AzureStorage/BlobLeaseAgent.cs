@@ -89,7 +89,15 @@ namespace TECHIS.Cloud.AzureStorage
             catch (StorageException storageException)
             {
                 //Trace.TraceError(storageException.Message);
-                if (storageException.InnerException is WebException webException)
+                if (storageException.RequestInformation?.HttpStatusCode==(int)HttpStatusCode.NotFound)
+                {
+                    blobNotFound = true;
+                }
+                else if (storageException.RequestInformation?.HttpStatusCode == (int)HttpStatusCode.Conflict)
+                {
+                    return null;
+                }
+                else if (storageException.InnerException is WebException webException)
                 {
                     if (webException.Response is HttpWebResponse response)
                     {
