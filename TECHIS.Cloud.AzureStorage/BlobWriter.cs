@@ -33,19 +33,11 @@ namespace TECHIS.Cloud.AzureStorage
         #region Public Methods 
         public void WriteToBlob(Stream ms, string blobFileName)
         {
-            //if (EnsureContainer())
-            //{
-            //    (GetBlockBlob(blobFileName)).UploadFromStream(ms);
-            //}
-            WriteToBlobAsync(ms, blobFileName).Wait();
+            WriteToBlobAsync(ms, blobFileName).ConfigureAwait(false).GetAwaiter().GetResult();// .Wait();
         }
         public void WriteToBlob(byte[] data, string blobFileName)
         {
-            //if (EnsureContainer())
-            //{
-            //    (GetBlockBlob(blobFileName)).UploadFromByteArray(data, 0, data.Length);
-            //}
-            WriteToBlobAsync(data, blobFileName).Wait();
+            WriteToBlobAsync(data, blobFileName).ConfigureAwait(false).GetAwaiter().GetResult(); //.Wait();
         }
 
         public async Task WriteToBlobAsync(Stream ms, string blobFileName)
