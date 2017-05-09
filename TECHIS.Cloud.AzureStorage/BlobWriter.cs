@@ -33,25 +33,25 @@ namespace TECHIS.Cloud.AzureStorage
         #region Public Methods 
         public void WriteToBlob(Stream ms, string blobFileName)
         {
-            WriteToBlobAsync(ms, blobFileName).ConfigureAwait(false).GetAwaiter().GetResult();// .Wait();
+            Task.Run(() => WriteToBlobAsync(ms, blobFileName)).Wait() ;
         }
         public void WriteToBlob(byte[] data, string blobFileName)
         {
-            WriteToBlobAsync(data, blobFileName).ConfigureAwait(false).GetAwaiter().GetResult(); //.Wait();
+            Task.Run(() => WriteToBlobAsync(data, blobFileName)).Wait();
         }
 
         public async Task WriteToBlobAsync(Stream ms, string blobFileName)
         {
             if (EnsureContainer())
             {
-                await (GetBlockBlob(blobFileName)).UploadFromStreamAsync(ms, null, DefaultBlobRequestOptions, null);
+                await (GetBlockBlob(blobFileName)).UploadFromStreamAsync(ms, null, DefaultBlobRequestOptions, null).ConfigureAwait(false);
             }
         }
         public async Task WriteToBlobAsync(byte[] data, string blobFileName)
         {
             if (EnsureContainer())
             {
-                await (GetBlockBlob(blobFileName)).UploadFromByteArrayAsync(data, 0, data.Length, null, DefaultBlobRequestOptions, null);
+                await (GetBlockBlob(blobFileName)).UploadFromByteArrayAsync(data, 0, data.Length, null, DefaultBlobRequestOptions, null).ConfigureAwait(false);
             }
         }
         #endregion

@@ -43,7 +43,7 @@ namespace TECHIS.Cloud.AzureStorage
             string text = null;
 
             if (EnsureContainer())
-                text = await GetTextFromBlobAsync(GetBlockBlob(blobFileName));
+                text = await GetTextFromBlobAsync(GetBlockBlob(blobFileName)).ConfigureAwait(false);
 
             return text;
         }
@@ -54,7 +54,7 @@ namespace TECHIS.Cloud.AzureStorage
             {
                 try
                 {
-                    await GetBlockBlob(blobFileName).DownloadToStreamAsync(output, null, DefaultBlobRequestOptions, null);
+                    await GetBlockBlob(blobFileName).DownloadToStreamAsync(output, null, DefaultBlobRequestOptions, null).ConfigureAwait(false);
                 }
                 catch (Exception ex) when (IsFileNotFound(ex))
                 {
@@ -64,7 +64,7 @@ namespace TECHIS.Cloud.AzureStorage
         }
         public virtual void ReadData(string blobFileName, Stream output)
         {
-            ReadDataAsync(blobFileName, output).ConfigureAwait(false).GetAwaiter().GetResult(); //.Wait();
+            Task.Run(()=> ReadDataAsync(blobFileName, output)).Wait(); 
         }
 
         #endregion
@@ -72,7 +72,7 @@ namespace TECHIS.Cloud.AzureStorage
         #region Protected 
         protected virtual string GetTextFromBlob(CloudBlob dataBlob)
         {
-            return GetTextFromBlobAsync(dataBlob).ConfigureAwait(false).GetAwaiter().GetResult(); //.Result;
+            return Task.Run(() => GetTextFromBlobAsync(dataBlob)).Result; //.Result;
         }
         protected virtual async Task<string> GetTextFromBlobAsync(CloudBlob dataBlob)
         {
@@ -81,7 +81,7 @@ namespace TECHIS.Cloud.AzureStorage
             {
                 try
                 {
-                    await dataBlob.DownloadToStreamAsync(memoryStream, null, DefaultBlobRequestOptions, null);
+                    await dataBlob.DownloadToStreamAsync(memoryStream, null, DefaultBlobRequestOptions, null).ConfigureAwait(false);
                     text = Encoding.GetString(memoryStream.ToArray());
                 }
                 catch(Exception ex) when( IsFileNotFound(ex) )

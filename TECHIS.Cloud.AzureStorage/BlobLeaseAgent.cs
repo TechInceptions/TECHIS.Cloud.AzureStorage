@@ -60,7 +60,7 @@ namespace TECHIS.Cloud.AzureStorage
         {
             try
             {
-                await _LeaseBlob.ReleaseLeaseAsync(new AccessCondition { LeaseId = leaseId });
+                await _LeaseBlob.ReleaseLeaseAsync(new AccessCondition { LeaseId = leaseId }).ConfigureAwait(false);
             }
             catch (StorageException e)
             {
@@ -84,7 +84,7 @@ namespace TECHIS.Cloud.AzureStorage
                     lds = MIN_LEASEDURATION;
                 }
                 AccessCondition ac = string.IsNullOrEmpty(reAcquireLeaseId) ? null : AccessCondition.GenerateLeaseCondition(reAcquireLeaseId);
-                return await _LeaseBlob.AcquireLeaseAsync(TimeSpan.FromSeconds(lds), reAcquireLeaseId, ac, null, null, token);
+                return await _LeaseBlob.AcquireLeaseAsync(TimeSpan.FromSeconds(lds), reAcquireLeaseId, ac, null, null, token).ConfigureAwait(false);
             }
             catch (StorageException storageException)
             {
@@ -119,8 +119,8 @@ namespace TECHIS.Cloud.AzureStorage
 
             if (blobNotFound)
             {
-                await CreateBlobAsync();
-                return await AcquireLeaseAsync(token);
+                await CreateBlobAsync().ConfigureAwait(false);
+                return await AcquireLeaseAsync(token).ConfigureAwait(false);
             }
             
             return null;
@@ -130,7 +130,7 @@ namespace TECHIS.Cloud.AzureStorage
         {
             try
             {
-                await _LeaseBlob.RenewLeaseAsync(new AccessCondition { LeaseId = leaseId },null,null, token);
+                await _LeaseBlob.RenewLeaseAsync(new AccessCondition { LeaseId = leaseId },null,null, token).ConfigureAwait(false);
                 return true;
             }
 
@@ -149,11 +149,11 @@ namespace TECHIS.Cloud.AzureStorage
             /* Container must already exist
              * await _LeaseBlob.Container.CreateIfNotExistsAsync(token);*/
 
-            if (!await _LeaseBlob.ExistsAsync())
+            if (!await _LeaseBlob.ExistsAsync().ConfigureAwait(false))
             {
                 try
                 {
-                    await _LeaseBlob.CreateAsync(0);
+                    await _LeaseBlob.CreateAsync(0).ConfigureAwait(false);
                 }
                 catch (StorageException e)
                 {
