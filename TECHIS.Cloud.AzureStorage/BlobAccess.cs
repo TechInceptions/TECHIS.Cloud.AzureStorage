@@ -132,7 +132,7 @@ namespace TECHIS.Cloud.AzureStorage
                 BlobContainer = _BlobClient.GetContainerReference(ConnectionSettings.ContainerName);
 
                 // Create the container if it doesn't already exist.
-                BlobContainer.CreateIfNotExistsAsync().Wait();
+                BlobContainer.CreateIfNotExistsAsync().ConfigureAwait(false).GetAwaiter().GetResult(); //.Wait();
                 IsValidContainer = true;
             }
 

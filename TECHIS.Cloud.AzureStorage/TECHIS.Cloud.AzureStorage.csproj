@@ -3,8 +3,8 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard1.5;netstandard1.6</TargetFrameworks>
     <Description>Simple API for Azure Storage</Description>
-    <Version>0.2.4</Version>
-    <PackageReleaseNotes>Updated dependencies</PackageReleaseNotes>
+    <Version>0.2.5</Version>
+    <PackageReleaseNotes>Added ConfigureAwait(false).GetAwaiter() to blocking calls. NET Standard Library version of Azure Storage only supports Async calls. To maintain our API surface which support synchronous as well as async, async versions of the calls are awaited.</PackageReleaseNotes>
     <Authors>TECH-IS, Arinze</Authors>
     <Company>TECH-IS INC.</Company>
     <Copyright>TECH-IS INC. 2017</Copyright>

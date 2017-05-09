@@ -64,18 +64,7 @@ namespace TECHIS.Cloud.AzureStorage
         }
         public virtual void ReadData(string blobFileName, Stream output)
         {
-            ReadDataAsync(blobFileName, output).Wait();
-            //if (EnsureContainer())
-            //{
-            //    try
-            //    {
-            //        GetBlockBlob(blobFileName).DownloadToStream(output, null, DefaultBlobRequestOptions, null);
-            //    }
-            //    catch (Exception ex) when (IsFileNotFound(ex))
-            //    {
-            //        //do nothing, thus no data is written to stream
-            //    }
-            //}
+            ReadDataAsync(blobFileName, output).ConfigureAwait(false).GetAwaiter().GetResult(); //.Wait();
         }
 
         #endregion
@@ -83,23 +72,7 @@ namespace TECHIS.Cloud.AzureStorage
         #region Protected 
         protected virtual string GetTextFromBlob(CloudBlob dataBlob)
         {
-            //string text;
-            //using (var memoryStream = new MemoryStream())
-            //{
-            //    try
-            //    {
-            //        dataBlob.DownloadToStream(memoryStream, null, DefaultBlobRequestOptions, null);
-            //        text = Encoding.GetString(memoryStream.ToArray());
-            //    }
-            //    catch (Exception ex) when (IsFileNotFound(ex))
-            //    {
-            //        text = null;
-            //    }
-            //}
-
-            //return text;
-
-            return GetTextFromBlobAsync(dataBlob).Result;
+            return GetTextFromBlobAsync(dataBlob).ConfigureAwait(false).GetAwaiter().GetResult(); //.Result;
         }
         protected virtual async Task<string> GetTextFromBlobAsync(CloudBlob dataBlob)
         {

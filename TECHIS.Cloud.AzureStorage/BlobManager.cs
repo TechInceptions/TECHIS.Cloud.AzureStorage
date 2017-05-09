@@ -29,7 +29,7 @@ namespace TECHIS.Cloud.AzureStorage
         public void Delete(string fileName)
         {
             if (EnsureContainer())
-                GetBlockBlob(fileName).DeleteAsync().Wait();
+                GetBlockBlob(fileName).DeleteAsync().ConfigureAwait(false).GetAwaiter().GetResult(); //.Wait();
         }
         public string[] List(string containerPath)
         {
@@ -57,7 +57,7 @@ namespace TECHIS.Cloud.AzureStorage
 
             //return names.ToArray();
 
-            return ListAsync(containerPath).Result;
+            return ListAsync(containerPath).ConfigureAwait(false).GetAwaiter().GetResult(); //.Result;
         }
         public async Task DeleteAsync(string fileName)
         {
