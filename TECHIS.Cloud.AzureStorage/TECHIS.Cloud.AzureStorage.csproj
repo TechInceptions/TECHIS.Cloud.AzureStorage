@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard1.5;netstandard1.6</TargetFrameworks>
+    <TargetFrameworks>netstandard1.5;netstandard1.6;netstandard2.0</TargetFrameworks>
     <Description>Simple API for Azure Storage</Description>
     <Version>0.2.5.1</Version>
     <PackageReleaseNotes>Added ConfigureAwait(false).GetAwaiter() to blocking calls. NET Standard Library version of Azure Storage only supports Async calls. To maintain our API surface which support synchronous as well as async, async versions of the calls are awaited.</PackageReleaseNotes>
@@ -20,10 +20,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="10.0.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
     <PackageReference Include="System.Net.Requests" Version="4.3.0" />
-    <PackageReference Include="TECHIS.Core" Version="4.0.5" />
-    <PackageReference Include="WindowsAzure.Storage" Version="8.1.1" />
+    <PackageReference Include="TECHIS.Core" Version="4.0.7" />
+    <PackageReference Include="WindowsAzure.Storage" Version="9.3.3" />
   </ItemGroup>
 
 </Project>
