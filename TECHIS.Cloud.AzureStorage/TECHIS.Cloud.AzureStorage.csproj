@@ -14,8 +14,8 @@
     <PackageTags>Azure Storage File API Simple Techis</PackageTags>
     <Product>SAFAS: Simple API for Azure Storage</Product>
     <RepositoryType>Git</RepositoryType>
-    <AssemblyVersion>0.2.5.1</AssemblyVersion>
-    <FileVersion>0.2.5.1</FileVersion>
+    <AssemblyVersion>0.2.5.6</AssemblyVersion>
+    <FileVersion>0.2.5.6</FileVersion>
     <PackageOutputPath>C:\Data\PackageRepo</PackageOutputPath>
   </PropertyGroup>
 
