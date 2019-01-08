@@ -60,26 +60,44 @@ namespace TECHIS.Cloud.AzureStorage
         {
             try
             {
-                await _LeaseBlob.ReleaseLeaseAsync(new AccessCondition { LeaseId = leaseId });
+                await _LeaseBlob.ReleaseLeaseAsync(new AccessCondition { LeaseId = leaseId }).ConfigureAwait(false);
             }
             catch (StorageException e)
             {
                 // Lease will eventually be released.
-                Trace.TraceError(e.Message);
+                //Trace.TraceError(e.Message);
             }
         }
 
-        public async Task<string> AcquireLeaseAsync(CancellationToken token)
+        /// <summary>
+        /// 15 seconds is the min allowed
+        /// </summary>
+        private const int MIN_LEASEDURATION = 15;
+        public async Task<string> AcquireLeaseAsync(CancellationToken token, int? leaseDurationSeconds = null, string reAcquireLeaseId = null)
         {
             bool blobNotFound = false;
             try
             {
-                return await _LeaseBlob.AcquireLeaseAsync(TimeSpan.FromSeconds(_LeaseDurationSeconds), null, null, null, null, token);
+                int lds = leaseDurationSeconds ?? _LeaseDurationSeconds;
+                if (lds<MIN_LEASEDURATION)
+                {
+                    lds = MIN_LEASEDURATION;
+                }
+                AccessCondition ac = string.IsNullOrEmpty(reAcquireLeaseId) ? null : AccessCondition.GenerateLeaseCondition(reAcquireLeaseId);
+                return await _LeaseBlob.AcquireLeaseAsync(TimeSpan.FromSeconds(lds), reAcquireLeaseId, ac, null, null, token).ConfigureAwait(false);
             }
             catch (StorageException storageException)
             {
-                Trace.TraceError(storageException.Message);
-                if (storageException.InnerException is WebException webException)
+                //Trace.TraceError(storageException.Message);
+                if (storageException.RequestInformation?.HttpStatusCode==(int)HttpStatusCode.NotFound)
+                {
+                    blobNotFound = true;
+                }
+                else if (storageException.RequestInformation?.HttpStatusCode == (int)HttpStatusCode.Conflict)
+                {
+                    return null;
+                }
+                else if (storageException.InnerException is WebException webException)
                 {
                     if (webException.Response is HttpWebResponse response)
                     {
@@ -101,8 +119,8 @@ namespace TECHIS.Cloud.AzureStorage
 
             if (blobNotFound)
             {
-                await CreateBlobAsync();
-                return await AcquireLeaseAsync(token);
+                await CreateBlobAsync().ConfigureAwait(false);
+                return await AcquireLeaseAsync(token).ConfigureAwait(false);
             }
             
             return null;
@@ -112,14 +130,14 @@ namespace TECHIS.Cloud.AzureStorage
         {
             try
             {
-                await _LeaseBlob.RenewLeaseAsync(new AccessCondition { LeaseId = leaseId },null,null, token);
+                await _LeaseBlob.RenewLeaseAsync(new AccessCondition { LeaseId = leaseId },null,null, token).ConfigureAwait(false);
                 return true;
             }
 
             catch (StorageException storageException)
             {
                 // catch (WebException webException)
-                Trace.TraceError(storageException.Message);
+                //Trace.TraceError(storageException.Message);
                 return false;
             }
         }
@@ -131,11 +149,11 @@ namespace TECHIS.Cloud.AzureStorage
             /* Container must already exist
              * await _LeaseBlob.Container.CreateIfNotExistsAsync(token);*/
 
-            if (!await _LeaseBlob.ExistsAsync())
+            if (!await _LeaseBlob.ExistsAsync().ConfigureAwait(false))
             {
                 try
                 {
-                    await _LeaseBlob.CreateAsync(0);
+                    await _LeaseBlob.CreateAsync(0).ConfigureAwait(false);
                 }
                 catch (StorageException e)
                 {

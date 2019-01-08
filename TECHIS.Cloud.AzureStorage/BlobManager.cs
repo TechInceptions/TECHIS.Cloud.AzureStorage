@@ -29,40 +29,16 @@ namespace TECHIS.Cloud.AzureStorage
         public void Delete(string fileName)
         {
             if (EnsureContainer())
-                GetBlockBlob(fileName).DeleteAsync().Wait();
+                Task.Run(() => GetBlockBlob(fileName).DeleteAsync()).Wait();
         }
         public string[] List(string containerPath)
         {
-            //if (containerPath == null)
-            //{
-            //    containerPath = string.Empty;
-            //}
-            //List<string> names = null;
-            //if (EnsureContainer())
-            //{
-            //    BlobContinuationToken continuationToken = null;
-            //    IEnumerable<IListBlobItem> results = new List<IListBlobItem>();
-            //    do
-            //    {
-            //        results = BlobContainer.ListBlobs(containerPath, true, BlobListingDetails.None, DefaultBlobRequestOptions);
-            //    }
-            //    while (continuationToken != null);
-            //    var containerUri = BlobContainer.Uri;
-            //    names = results.ToList().ConvertAll(p => GetFileNameFromBlobURI(p.Uri));
-            //}
-            //if (names == null)
-            //{
-            //    names = new List<string>(0);
-            //}
-
-            //return names.ToArray();
-
-            return ListAsync(containerPath).Result;
+            return Task.Run(() => ListAsync(containerPath)).Result; 
         }
         public async Task DeleteAsync(string fileName)
         {
             if (EnsureContainer())
-                await GetBlockBlob(fileName).DeleteAsync() ;
+                await GetBlockBlob(fileName).DeleteAsync().ConfigureAwait(false);
         }
 
         /// <summary>
@@ -86,7 +62,7 @@ namespace TECHIS.Cloud.AzureStorage
                 List<IListBlobItem> results = new List<IListBlobItem>();
                 do
                 {
-                    var response = await BlobContainer.ListBlobsSegmentedAsync(containerPath, true, BlobListingDetails.None,null,  continuationToken, DefaultBlobRequestOptions,null);
+                    var response = await BlobContainer.ListBlobsSegmentedAsync(containerPath, true, BlobListingDetails.None,null,  continuationToken, DefaultBlobRequestOptions,null).ConfigureAwait(false);
                     continuationToken = response.ContinuationToken;
                     results.AddRange(response.Results);
                 }

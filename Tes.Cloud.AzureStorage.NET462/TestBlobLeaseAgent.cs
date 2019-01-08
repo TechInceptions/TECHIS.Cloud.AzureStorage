@@ -9,11 +9,11 @@ using System.Threading;
 namespace Test.Cloud.AzureStorage
 {
     [TestClass]
-    public class TestBlobLeaseAgent
+    public class TestBlobLeaseAgent462
     {
 
         [TestMethod]
-        public void TestAcquireLease()
+        public void TestAcquireLease462()
         {
             string errorMessage = null;
             string leaseName = "testleasesc3";
@@ -46,7 +46,7 @@ namespace Test.Cloud.AzureStorage
             }
         }
         [TestMethod]
-        public void TestReAcquireLease()
+        public void TestReAcquireLease462()
         {
             string errorMessage = null;
             string leaseName = "testleasesc3";
