@@ -42,14 +42,14 @@ namespace TECHIS.Cloud.AzureStorage
 
         public async Task WriteToBlobAsync(Stream ms, string blobFileName)
         {
-            if (EnsureContainer())
+            if (await EnsureContainerAsync())
             {
                 await (GetBlockBlob(blobFileName)).UploadFromStreamAsync(ms, null, DefaultBlobRequestOptions, null).ConfigureAwait(false);
             }
         }
         public async Task WriteToBlobAsync(byte[] data, string blobFileName)
         {
-            if (EnsureContainer())
+            if (await EnsureContainerAsync())
             {
                 await (GetBlockBlob(blobFileName)).UploadFromByteArrayAsync(data, 0, data.Length, null, DefaultBlobRequestOptions, null).ConfigureAwait(false);
             }

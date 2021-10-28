@@ -42,7 +42,7 @@ namespace TECHIS.Cloud.AzureStorage
         {
             string text = null;
 
-            if (EnsureContainer())
+            if ( await EnsureContainerAsync())
                 text = await GetTextFromBlobAsync(GetBlockBlob(blobFileName)).ConfigureAwait(false);
 
             return text;
@@ -50,7 +50,7 @@ namespace TECHIS.Cloud.AzureStorage
 
         public virtual async Task ReadDataAsync(string blobFileName, Stream output)
         {
-            if (EnsureContainer())
+            if (await EnsureContainerAsync())
             {
                 try
                 {

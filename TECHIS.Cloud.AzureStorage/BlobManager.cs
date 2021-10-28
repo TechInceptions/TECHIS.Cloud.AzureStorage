@@ -31,13 +31,18 @@ namespace TECHIS.Cloud.AzureStorage
             if (EnsureContainer())
                 Task.Run(() => GetBlockBlob(fileName).DeleteAsync()).Wait();
         }
+        public async Task DeleteAsymc(string fileName)
+        {
+            if (await EnsureContainerAsync())
+                await GetBlockBlob(fileName).DeleteAsync(); 
+        }
         public string[] List(string containerPath)
         {
             return Task.Run(() => ListAsync(containerPath)).Result; 
         }
         public async Task DeleteAsync(string fileName)
         {
-            if (EnsureContainer())
+            if (await EnsureContainerAsync())
                 await GetBlockBlob(fileName).DeleteAsync().ConfigureAwait(false);
         }
 
@@ -56,7 +61,7 @@ namespace TECHIS.Cloud.AzureStorage
                 containerPath = string.Empty;
             }
             List<string> names = null;
-            if (EnsureContainer())
+            if (await EnsureContainerAsync())
             {
                 BlobContinuationToken continuationToken = null;
                 List<IListBlobItem> results = new List<IListBlobItem>();

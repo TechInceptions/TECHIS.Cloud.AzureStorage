@@ -21,6 +21,25 @@ namespace TECHIS.Cloud.AzureStorage
 
         #region Connect 
 
+        public async Task<BlobLeaseAgent> ConnectAsync(string containerUri, Encoding encoding = null)
+        {
+            base.Connect(containerUri, encoding);
+            if (await EnsureContainerAsync())
+            {
+                _LeaseBlob = BlobContainer.GetPageBlobReference(_LeaseBlobName);
+            }
+            return this;
+        }
+
+        public async Task<BlobLeaseAgent> ConnectAsync(string azureStorageConnectionString, string containerName, Encoding encoding = null)
+        {
+            base.Connect(azureStorageConnectionString, containerName, encoding);
+            if (await EnsureContainerAsync())
+            {
+                _LeaseBlob = BlobContainer.GetPageBlobReference(_LeaseBlobName);
+            }
+            return this;
+        }
         public new BlobLeaseAgent Connect(string containerUri, Encoding encoding = null)
         {
             base.Connect(containerUri, encoding);
@@ -62,7 +81,7 @@ namespace TECHIS.Cloud.AzureStorage
             {
                 await _LeaseBlob.ReleaseLeaseAsync(new AccessCondition { LeaseId = leaseId }).ConfigureAwait(false);
             }
-            catch (StorageException e)
+            catch (StorageException)
             {
                 // Lease will eventually be released.
                 //Trace.TraceError(e.Message);
@@ -134,7 +153,7 @@ namespace TECHIS.Cloud.AzureStorage
                 return true;
             }
 
-            catch (StorageException storageException)
+            catch (StorageException)
             {
                 // catch (WebException webException)
                 //Trace.TraceError(storageException.Message);

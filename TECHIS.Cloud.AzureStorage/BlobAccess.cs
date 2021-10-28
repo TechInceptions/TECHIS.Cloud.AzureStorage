@@ -138,6 +138,26 @@ namespace TECHIS.Cloud.AzureStorage
 
             return IsValidContainer;
         }
+        protected async Task<bool> CreateContainerFromBlobClientAsync()
+        {
+            if (!IsClientValid)
+            {
+                CreateClient();
+            }
+
+            if (IsClientValid)
+            {
+
+                // Retrieve a reference to a container.
+                BlobContainer = _BlobClient.GetContainerReference(ConnectionSettings.ContainerName);
+
+                // Create the container if it doesn't already exist.
+                await BlobContainer.CreateIfNotExistsAsync();
+                IsValidContainer = true;
+            }
+
+            return IsValidContainer;
+        }
         #endregion
 
         #region Public Methods 
@@ -183,6 +203,39 @@ namespace TECHIS.Cloud.AzureStorage
 
         #region Protected 
 
+        protected async Task<bool> EnsureContainerAsync()
+        {
+            bool success;
+            if ((!IsValidContainer) && (!ConnectToContainer()))
+            {
+                success = await CreateContainerFromBlobClientAsync();
+            }
+            else
+            {
+                success = true;
+            }
+
+            if (!success)
+            {
+
+                if (!IsValidContainer)
+                {
+                    throw new InvalidOperationException(Errors.STORE_CONTAINER_INVALID);
+                }
+
+                if (!IsAccountValid)
+                {
+                    throw new InvalidOperationException(Errors.STORE_CONNECTION_INVALID);
+                }
+
+                if (!IsClientValid)
+                {
+                    throw new InvalidOperationException(Errors.STORE_CLIENT_INVALID);
+                }
+            }
+
+            return success;
+        }
         protected bool EnsureContainer()
         {
             bool success;
