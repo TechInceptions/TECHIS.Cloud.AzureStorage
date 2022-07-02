@@ -4,9 +4,10 @@ using System.Diagnostics;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Blob;
-using Microsoft.WindowsAzure.Storage.RetryPolicies;
+using Azure;
+using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
+using Azure.Storage.Blobs.Specialized;
 using System.Text;
 
 namespace TECHIS.Cloud.AzureStorage
@@ -14,7 +15,7 @@ namespace TECHIS.Cloud.AzureStorage
     public  class BlobLeaseAgent:BlobAccess
     {
         #region Fields 
-        private CloudPageBlob _LeaseBlob;
+        private PageBlobClient _LeaseBlob;
         private readonly string _LeaseBlobName;
         private readonly int _LeaseDurationSeconds;
         #endregion
@@ -26,7 +27,7 @@ namespace TECHIS.Cloud.AzureStorage
             base.Connect(containerUri, encoding);
             if (await EnsureContainerAsync())
             {
-                _LeaseBlob = BlobContainer.GetPageBlobReference(_LeaseBlobName);
+                _LeaseBlob = BlobContainer.GetPageBlobClient(_LeaseBlobName);
             }
             return this;
         }
@@ -36,7 +37,7 @@ namespace TECHIS.Cloud.AzureStorage
             base.Connect(azureStorageConnectionString, containerName, encoding);
             if (await EnsureContainerAsync())
             {
-                _LeaseBlob = BlobContainer.GetPageBlobReference(_LeaseBlobName);
+                _LeaseBlob = BlobContainer.GetPageBlobClient(_LeaseBlobName);
             }
             return this;
         }
@@ -45,7 +46,7 @@ namespace TECHIS.Cloud.AzureStorage
             base.Connect(containerUri, encoding);
             if (EnsureContainer())
             {
-                _LeaseBlob = BlobContainer.GetPageBlobReference(_LeaseBlobName);
+                _LeaseBlob = BlobContainer.GetPageBlobClient(_LeaseBlobName);
             }
             return this;
         }
@@ -55,7 +56,7 @@ namespace TECHIS.Cloud.AzureStorage
             base.Connect(azureStorageConnectionString, containerName, encoding);
             if (EnsureContainer())
             {
-                _LeaseBlob = BlobContainer.GetPageBlobReference(_LeaseBlobName);
+                _LeaseBlob = BlobContainer.GetPageBlobClient(_LeaseBlobName);
             }
             return this;
         }
@@ -75,13 +76,25 @@ namespace TECHIS.Cloud.AzureStorage
             return (new BlobLeaseAgent(leaseBlobName, leaseDurationSeconds)).Connect(containerUri);
         }
 
+        //public async Task ReleaseLeaseAsync(string leaseId)
+        //{
+        //    try
+        //    {
+        //        await _LeaseBlob.ReleaseLeaseAsync(new AccessCondition { LeaseId = leaseId }).ConfigureAwait(false);
+        //    }
+        //    catch (StorageException)
+        //    {
+        //        // Lease will eventually be released.
+        //        //Trace.TraceError(e.Message);
+        //    }
+        //}
         public async Task ReleaseLeaseAsync(string leaseId)
         {
             try
             {
-                await _LeaseBlob.ReleaseLeaseAsync(new AccessCondition { LeaseId = leaseId }).ConfigureAwait(false);
+                await _LeaseBlob.GetBlobLeaseClient(leaseId).ReleaseAsync().ConfigureAwait(false);
             }
-            catch (StorageException)
+            catch (RequestFailedException _)
             {
                 // Lease will eventually be released.
                 //Trace.TraceError(e.Message);
@@ -102,17 +115,19 @@ namespace TECHIS.Cloud.AzureStorage
                 {
                     lds = MIN_LEASEDURATION;
                 }
-                AccessCondition ac = string.IsNullOrEmpty(reAcquireLeaseId) ? null : AccessCondition.GenerateLeaseCondition(reAcquireLeaseId);
-                return await _LeaseBlob.AcquireLeaseAsync(TimeSpan.FromSeconds(lds), reAcquireLeaseId, ac, null, null, token).ConfigureAwait(false);
+                
+                var r = await _LeaseBlob.GetBlobLeaseClient(reAcquireLeaseId).AcquireAsync(TimeSpan.FromSeconds(lds)).ConfigureAwait(false);
+
+                return r.Value.LeaseId;
             }
-            catch (StorageException storageException)
+            catch (RequestFailedException storageException)
             {
                 //Trace.TraceError(storageException.Message);
-                if (storageException.RequestInformation?.HttpStatusCode==(int)HttpStatusCode.NotFound)
+                if (storageException.Status ==(int)HttpStatusCode.NotFound)
                 {
                     blobNotFound = true;
                 }
-                else if (storageException.RequestInformation?.HttpStatusCode == (int)HttpStatusCode.Conflict)
+                else if (storageException.Status == (int)HttpStatusCode.Conflict)
                 {
                     return null;
                 }
@@ -149,11 +164,11 @@ namespace TECHIS.Cloud.AzureStorage
         {
             try
             {
-                await _LeaseBlob.RenewLeaseAsync(new AccessCondition { LeaseId = leaseId },null,null, token).ConfigureAwait(false);
+                await _LeaseBlob.GetBlobLeaseClient(leaseId).RenewAsync(null, token).ConfigureAwait(false);
                 return true;
             }
 
-            catch (StorageException)
+            catch (RequestFailedException _)
             {
                 // catch (WebException webException)
                 //Trace.TraceError(storageException.Message);
@@ -174,7 +189,15 @@ namespace TECHIS.Cloud.AzureStorage
                 {
                     await _LeaseBlob.CreateAsync(0).ConfigureAwait(false);
                 }
-                catch (StorageException e)
+                catch (RequestFailedException e)
+                {
+
+                    if (e.Status != (int)HttpStatusCode.PreconditionFailed)
+                    {
+                        throw;
+                    }
+                }
+                catch (Exception e)
                 {
                     if (e.InnerException is WebException webException)
                     {

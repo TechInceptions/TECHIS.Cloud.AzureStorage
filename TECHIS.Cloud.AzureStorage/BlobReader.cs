@@ -6,8 +6,10 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 //using Microsoft.Azure;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Blob;
+using Azure;
+using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
+using Azure.Storage.Blobs.Specialized;
 
 
 namespace TECHIS.Cloud.AzureStorage
