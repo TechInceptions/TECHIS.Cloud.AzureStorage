@@ -54,9 +54,9 @@ namespace Test.Cloud.AzureStorage
             Assert.True(list != null && list.Length > 0 && list.All(p => p.Contains($"{path}/")), "failed to list only items in child folder");
         }
 
-        private string[] ListFilesAsync(string path)
+        private async Task<string[]> ListFilesAsync(string path)
         {
-            return ConnectedManager.ListAsync(path).Result;
+            return await ConnectedManager.ListAsync(path);
         }
 
         private BlobManager ConnectedManager=> (new BlobManager()).Connect(Connector.GetContainerUri());
