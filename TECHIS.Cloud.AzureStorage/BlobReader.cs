@@ -56,7 +56,7 @@ namespace TECHIS.Cloud.AzureStorage
             {
                 try
                 {
-                    await GetBlockBlob(blobFileName).DownloadToStreamAsync(output, null, DefaultBlobRequestOptions, null).ConfigureAwait(false);
+                    await GetBlockBlob(blobFileName).DownloadToAsync(output).ConfigureAwait(false);
                 }
                 catch (Exception ex) when (IsFileNotFound(ex))
                 {
@@ -64,26 +64,37 @@ namespace TECHIS.Cloud.AzureStorage
                 }
             }
         }
+
         public virtual void ReadData(string blobFileName, Stream output)
         {
-            Task.Run(()=> ReadDataAsync(blobFileName, output)).Wait(); 
+            if (EnsureContainer())
+            {
+                try
+                {
+                    GetBlockBlob(blobFileName).DownloadTo(output);
+                }
+                catch (Exception ex) when (IsFileNotFound(ex))
+                {
+                    //do nothing, thus no data is written to stream
+                }
+            }
         }
 
         #endregion
 
         #region Protected 
-        protected virtual string GetTextFromBlob(CloudBlob dataBlob)
+        protected virtual string GetTextFromBlob(BlobClient dataBlob)
         {
-            return Task.Run(() => GetTextFromBlobAsync(dataBlob)).Result; //.Result;
+            return GetTextFromBlob(dataBlob);
         }
-        protected virtual async Task<string> GetTextFromBlobAsync(CloudBlob dataBlob)
+        protected virtual async Task<string> GetTextFromBlobAsync(BlobClient dataBlob)
         {
             string text;
             using (var memoryStream = new MemoryStream())
             {
                 try
                 {
-                    await dataBlob.DownloadToStreamAsync(memoryStream, null, DefaultBlobRequestOptions, null).ConfigureAwait(false);
+                    await dataBlob.DownloadToAsync(memoryStream).ConfigureAwait(false);
                     text = Encoding.GetString(memoryStream.ToArray());
                 }
                 catch(Exception ex) when( IsFileNotFound(ex) )
@@ -99,19 +110,19 @@ namespace TECHIS.Cloud.AzureStorage
         {
             bool setDefault = false;
 
-            StorageException exception = ex as StorageException;
+            RequestFailedException exception = ex as RequestFailedException;
             if ( ex is AggregateException)
             {
-                exception = ex.InnerException as StorageException;
+                exception = ex.InnerException as RequestFailedException;
             }
-            else if(ex is StorageException)
+            else if(ex is RequestFailedException)
             {
-                exception = ex as StorageException;
+                exception = ex as RequestFailedException;
             }
 
             if (exception!=null)
             {
-                switch (exception.RequestInformation.HttpStatusCode)
+                switch (exception.Status)
                 {
                     case (int)HttpStatusCode.NotFound:
                         setDefault = true;

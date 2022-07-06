@@ -11,7 +11,6 @@ namespace Test.Cloud.AzureStorage
     [TestClass]
     public class TestBlobLeaseAgent
     {
-
         [TestMethod]
         public async Task TestAcquireLease()
         {

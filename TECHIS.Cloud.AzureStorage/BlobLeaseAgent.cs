@@ -94,7 +94,7 @@ namespace TECHIS.Cloud.AzureStorage
             {
                 await _LeaseBlob.GetBlobLeaseClient(leaseId).ReleaseAsync().ConfigureAwait(false);
             }
-            catch (RequestFailedException _)
+            catch //RequestFailedException _
             {
                 // Lease will eventually be released.
                 //Trace.TraceError(e.Message);
@@ -168,7 +168,7 @@ namespace TECHIS.Cloud.AzureStorage
                 return true;
             }
 
-            catch (RequestFailedException _)
+            catch //(RequestFailedException _)
             {
                 // catch (WebException webException)
                 //Trace.TraceError(storageException.Message);
