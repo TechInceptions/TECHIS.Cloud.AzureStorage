@@ -58,7 +58,7 @@ namespace TECHIS.Cloud.AzureStorage
         {
             KeyVaultSecret secret = _client.GetSecret(key);
 
-            return secret?.Value;
+            return secret.Value;
 
         }
     }
