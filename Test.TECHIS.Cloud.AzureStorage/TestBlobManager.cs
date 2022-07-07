@@ -12,17 +12,18 @@ namespace Test.Cloud.AzureStorage
     public class TestBlobManager
     {
         [Fact]
-        public void TestDelete()
+        public async Task TestDelete()
         {
             string path = "ForDelete";
-            var list = ListFilesAsync(path);
+            //WriteTextFile(path);
+            var list = await ListFilesAsync(path);
 
             Assert.True(list != null && list.Length > 0, "Failed to get valid location for testing delete location");
 
             var initial1st = list[0];
             ConnectedManager.DeleteAsync(initial1st).Wait();
 
-            var new1st = ListFilesAsync(path)[0];
+            var new1st = (await ListFilesAsync(path))[0];
 
             Assert.False(string.Equals(initial1st, new1st), "Failed to delete item");
         }
@@ -58,7 +59,13 @@ namespace Test.Cloud.AzureStorage
         {
             return await ConnectedManager.ListAsync(path);
         }
+        public void WriteTextFile(string prefix)
+        {
+            BlobWriter br = new();
+            br.Connect(Connector.GetContainerUri()).WriteToBlob(System.Text.Encoding.UTF8.GetBytes("Test data"), $"{prefix}/l3.txt");
 
+            //Assert.False(string.IsNullOrEmpty(data), "Failed to read blob file");
+        }
         private BlobManager ConnectedManager=> (new BlobManager()).Connect(Connector.GetContainerUri());
 
         

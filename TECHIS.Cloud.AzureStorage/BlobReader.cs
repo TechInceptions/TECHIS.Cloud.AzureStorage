@@ -83,9 +83,27 @@ namespace TECHIS.Cloud.AzureStorage
         #endregion
 
         #region Protected 
+        //protected virtual string GetTextFromBlob(BlobClient dataBlob)
+        //{
+        //    return GetTextFromBlob(dataBlob);
+        //}
         protected virtual string GetTextFromBlob(BlobClient dataBlob)
         {
-            return GetTextFromBlob(dataBlob);
+            string text;
+            using (var memoryStream = new MemoryStream())
+            {
+                try
+                {
+                    dataBlob.DownloadTo(memoryStream);
+                    text = Encoding.GetString(memoryStream.ToArray());
+                }
+                catch (Exception ex) when (IsFileNotFound(ex))
+                {
+                    text = null;
+                }
+            }
+
+            return text;
         }
         protected virtual async Task<string> GetTextFromBlobAsync(BlobClient dataBlob)
         {

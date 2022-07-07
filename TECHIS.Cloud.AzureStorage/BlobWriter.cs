@@ -36,14 +36,14 @@ namespace TECHIS.Cloud.AzureStorage
         {
             if (EnsureContainer())
             {
-                (GetBlockBlob(blobFileName)).Upload(ms);
+                (GetBlockBlob(blobFileName)).Upload(ms, true);
             }
         }
         public void WriteToBlob(byte[] data, string blobFileName)
         {
             if (EnsureContainer())
             {
-                (GetBlockBlob(blobFileName)).Upload(new BinaryData(data));
+                (GetBlockBlob(blobFileName)).Upload(new BinaryData(data),true);
             }
         }
 
@@ -51,14 +51,14 @@ namespace TECHIS.Cloud.AzureStorage
         {
             if (await EnsureContainerAsync())
             {
-                await (GetBlockBlob(blobFileName)).UploadAsync(ms).ConfigureAwait(false);
+                await (GetBlockBlob(blobFileName)).UploadAsync(ms, true).ConfigureAwait(false);
             }
         }
         public async Task WriteToBlobAsync(byte[] data, string blobFileName)
         {
             if (await EnsureContainerAsync())
             {
-                await (GetBlockBlob(blobFileName)).UploadAsync(new BinaryData(data)).ConfigureAwait(false);
+                await (GetBlockBlob(blobFileName)).UploadAsync(new BinaryData(data), true).ConfigureAwait(false);
             }
         }
         #endregion

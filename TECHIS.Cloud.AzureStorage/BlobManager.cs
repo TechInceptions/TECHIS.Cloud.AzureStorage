@@ -67,7 +67,7 @@ namespace TECHIS.Cloud.AzureStorage
                 var pageable = BlobContainer.GetBlobsAsync(prefix: prefix);
                 var results = await GetListFromPageAsync(pageable);
 
-                names = results .Where(blobItem => blobItem.IsLatestVersion!=null && blobItem.IsLatestVersion.Value)
+                names = results .Where(blobItem => (blobItem.IsLatestVersion==null || blobItem.IsLatestVersion.Value) && !blobItem.Deleted)
                                 .Select(blobItem => blobItem.Name).ToList();
             }
             if (names==null)
