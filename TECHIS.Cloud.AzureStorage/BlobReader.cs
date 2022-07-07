@@ -32,22 +32,20 @@ namespace TECHIS.Cloud.AzureStorage
 
         public virtual string ReadText(string blobFileName)
         {
-            string text = null;
 
             if (EnsureContainer())
-                text = GetTextFromBlob(GetBlockBlob(blobFileName));
+                return GetTextFromBlob(GetBlockBlob(blobFileName));
 
-            return text;
+            return null;
         }
 
         public virtual async Task<string> ReadTextAsync(string blobFileName)
         {
-            string text = null;
-
+            
             if ( await EnsureContainerAsync())
-                text = await GetTextFromBlobAsync(GetBlockBlob(blobFileName)).ConfigureAwait(false);
+                return await GetTextFromBlobAsync(GetBlockBlob(blobFileName)).ConfigureAwait(false);
 
-            return text;
+            return null;
         }
 
         public virtual async Task ReadDataAsync(string blobFileName, Stream output)
@@ -126,30 +124,18 @@ namespace TECHIS.Cloud.AzureStorage
 
         protected virtual bool IsFileNotFound(Exception ex)
         {
-            bool setDefault = false;
-
             RequestFailedException exception = ex as RequestFailedException;
-            if ( ex is AggregateException)
+            if (exception is null && ex is AggregateException)
             {
                 exception = ex.InnerException as RequestFailedException;
             }
-            else if(ex is RequestFailedException)
+
+            if (exception != null && exception.Status == (int)HttpStatusCode.NotFound)
             {
-                exception = ex as RequestFailedException;
+                return true;
             }
 
-            if (exception!=null)
-            {
-                switch (exception.Status)
-                {
-                    case (int)HttpStatusCode.NotFound:
-                        setDefault = true;
-                        break;
-                }
-            }
-            
-
-            return setDefault;
+            return false;
         }
         #endregion
 
