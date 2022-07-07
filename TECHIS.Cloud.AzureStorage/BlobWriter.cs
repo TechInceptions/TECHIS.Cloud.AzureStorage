@@ -5,9 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 //using Microsoft.Azure;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Blob;
-using Microsoft.WindowsAzure.Storage.RetryPolicies;
+using Azure;
+using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
+using Azure.Storage.Blobs.Specialized;
 
 
 namespace TECHIS.Cloud.AzureStorage
@@ -33,25 +34,31 @@ namespace TECHIS.Cloud.AzureStorage
         #region Public Methods 
         public void WriteToBlob(Stream ms, string blobFileName)
         {
-            Task.Run(() => WriteToBlobAsync(ms, blobFileName)).Wait() ;
+            if (EnsureContainer())
+            {
+                (GetBlockBlob(blobFileName)).Upload(ms, true);
+            }
         }
         public void WriteToBlob(byte[] data, string blobFileName)
         {
-            Task.Run(() => WriteToBlobAsync(data, blobFileName)).Wait();
+            if (EnsureContainer())
+            {
+                (GetBlockBlob(blobFileName)).Upload(new BinaryData(data),true);
+            }
         }
 
         public async Task WriteToBlobAsync(Stream ms, string blobFileName)
         {
             if (await EnsureContainerAsync())
             {
-                await (GetBlockBlob(blobFileName)).UploadFromStreamAsync(ms, null, DefaultBlobRequestOptions, null).ConfigureAwait(false);
+                await (GetBlockBlob(blobFileName)).UploadAsync(ms, true).ConfigureAwait(false);
             }
         }
         public async Task WriteToBlobAsync(byte[] data, string blobFileName)
         {
             if (await EnsureContainerAsync())
             {
-                await (GetBlockBlob(blobFileName)).UploadFromByteArrayAsync(data, 0, data.Length, null, DefaultBlobRequestOptions, null).ConfigureAwait(false);
+                await (GetBlockBlob(blobFileName)).UploadAsync(new BinaryData(data), true).ConfigureAwait(false);
             }
         }
         #endregion

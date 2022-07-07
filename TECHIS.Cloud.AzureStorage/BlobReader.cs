@@ -6,8 +6,10 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 //using Microsoft.Azure;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Blob;
+using Azure;
+using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
+using Azure.Storage.Blobs.Specialized;
 
 
 namespace TECHIS.Cloud.AzureStorage
@@ -30,22 +32,20 @@ namespace TECHIS.Cloud.AzureStorage
 
         public virtual string ReadText(string blobFileName)
         {
-            string text = null;
 
             if (EnsureContainer())
-                text = GetTextFromBlob(GetBlockBlob(blobFileName));
+                return GetTextFromBlob(GetBlockBlob(blobFileName));
 
-            return text;
+            return null;
         }
 
         public virtual async Task<string> ReadTextAsync(string blobFileName)
         {
-            string text = null;
-
+            
             if ( await EnsureContainerAsync())
-                text = await GetTextFromBlobAsync(GetBlockBlob(blobFileName)).ConfigureAwait(false);
+                return await GetTextFromBlobAsync(GetBlockBlob(blobFileName)).ConfigureAwait(false);
 
-            return text;
+            return null;
         }
 
         public virtual async Task ReadDataAsync(string blobFileName, Stream output)
@@ -54,7 +54,7 @@ namespace TECHIS.Cloud.AzureStorage
             {
                 try
                 {
-                    await GetBlockBlob(blobFileName).DownloadToStreamAsync(output, null, DefaultBlobRequestOptions, null).ConfigureAwait(false);
+                    await GetBlockBlob(blobFileName).DownloadToAsync(output).ConfigureAwait(false);
                 }
                 catch (Exception ex) when (IsFileNotFound(ex))
                 {
@@ -62,26 +62,55 @@ namespace TECHIS.Cloud.AzureStorage
                 }
             }
         }
+
         public virtual void ReadData(string blobFileName, Stream output)
         {
-            Task.Run(()=> ReadDataAsync(blobFileName, output)).Wait(); 
+            if (EnsureContainer())
+            {
+                try
+                {
+                    GetBlockBlob(blobFileName).DownloadTo(output);
+                }
+                catch (Exception ex) when (IsFileNotFound(ex))
+                {
+                    //do nothing, thus no data is written to stream
+                }
+            }
         }
 
         #endregion
 
         #region Protected 
-        protected virtual string GetTextFromBlob(CloudBlob dataBlob)
-        {
-            return Task.Run(() => GetTextFromBlobAsync(dataBlob)).Result; //.Result;
-        }
-        protected virtual async Task<string> GetTextFromBlobAsync(CloudBlob dataBlob)
+        //protected virtual string GetTextFromBlob(BlobClient dataBlob)
+        //{
+        //    return GetTextFromBlob(dataBlob);
+        //}
+        protected virtual string GetTextFromBlob(BlobClient dataBlob)
         {
             string text;
             using (var memoryStream = new MemoryStream())
             {
                 try
                 {
-                    await dataBlob.DownloadToStreamAsync(memoryStream, null, DefaultBlobRequestOptions, null).ConfigureAwait(false);
+                    dataBlob.DownloadTo(memoryStream);
+                    text = Encoding.GetString(memoryStream.ToArray());
+                }
+                catch (Exception ex) when (IsFileNotFound(ex))
+                {
+                    text = null;
+                }
+            }
+
+            return text;
+        }
+        protected virtual async Task<string> GetTextFromBlobAsync(BlobClient dataBlob)
+        {
+            string text;
+            using (var memoryStream = new MemoryStream())
+            {
+                try
+                {
+                    await dataBlob.DownloadToAsync(memoryStream).ConfigureAwait(false);
                     text = Encoding.GetString(memoryStream.ToArray());
                 }
                 catch(Exception ex) when( IsFileNotFound(ex) )
@@ -95,30 +124,18 @@ namespace TECHIS.Cloud.AzureStorage
 
         protected virtual bool IsFileNotFound(Exception ex)
         {
-            bool setDefault = false;
-
-            StorageException exception = ex as StorageException;
-            if ( ex is AggregateException)
+            RequestFailedException exception = ex as RequestFailedException;
+            if (exception is null && ex is AggregateException)
             {
-                exception = ex.InnerException as StorageException;
-            }
-            else if(ex is StorageException)
-            {
-                exception = ex as StorageException;
+                exception = ex.InnerException as RequestFailedException;
             }
 
-            if (exception!=null)
+            if (exception != null && exception.Status == (int)HttpStatusCode.NotFound)
             {
-                switch (exception.RequestInformation.HttpStatusCode)
-                {
-                    case (int)HttpStatusCode.NotFound:
-                        setDefault = true;
-                        break;
-                }
+                return true;
             }
-            
 
-            return setDefault;
+            return false;
         }
         #endregion
 

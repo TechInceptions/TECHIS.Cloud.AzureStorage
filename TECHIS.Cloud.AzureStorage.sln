@@ -1,15 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26403.7
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32112.339
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TECHIS.Cloud.AzureStorage", "TECHIS.Cloud.AzureStorage\TECHIS.Cloud.AzureStorage.csproj", "{3E5DC8F3-D513-4A7B-912F-946705C3792B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TECHIS.Cloud.AzureStorage", "TECHIS.Cloud.AzureStorage\TECHIS.Cloud.AzureStorage.csproj", "{3E5DC8F3-D513-4A7B-912F-946705C3792B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.Cloud.AzureStorage", "Test.Cloud.AzureStorage\Test.Cloud.AzureStorage.csproj", "{18806F27-86EF-45B8-90AC-0DA46EE0473F}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.Cloud.AzureStorage.NET462", "Tes.Cloud.AzureStorage.NET462\Test.Cloud.AzureStorage.NET462.csproj", "{0C4F9FA3-3687-466A-8174-014D64BA2233}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestConsoleApp1", "TestConsoleApp1\TestConsoleApp1.csproj", "{E782BDC3-E68D-4C87-804C-04C4F4B28C9E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.TECHIS.Cloud.AzureStorage", "Test.TECHIS.Cloud.AzureStorage\Test.TECHIS.Cloud.AzureStorage.csproj", "{9484DFDB-00C7-46EE-A972-F5545C993903}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,20 +17,15 @@ Global
 		{3E5DC8F3-D513-4A7B-912F-946705C3792B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3E5DC8F3-D513-4A7B-912F-946705C3792B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3E5DC8F3-D513-4A7B-912F-946705C3792B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{18806F27-86EF-45B8-90AC-0DA46EE0473F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{18806F27-86EF-45B8-90AC-0DA46EE0473F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{18806F27-86EF-45B8-90AC-0DA46EE0473F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{18806F27-86EF-45B8-90AC-0DA46EE0473F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0C4F9FA3-3687-466A-8174-014D64BA2233}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0C4F9FA3-3687-466A-8174-014D64BA2233}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0C4F9FA3-3687-466A-8174-014D64BA2233}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0C4F9FA3-3687-466A-8174-014D64BA2233}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E782BDC3-E68D-4C87-804C-04C4F4B28C9E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E782BDC3-E68D-4C87-804C-04C4F4B28C9E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E782BDC3-E68D-4C87-804C-04C4F4B28C9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E782BDC3-E68D-4C87-804C-04C4F4B28C9E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9484DFDB-00C7-46EE-A972-F5545C993903}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9484DFDB-00C7-46EE-A972-F5545C993903}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9484DFDB-00C7-46EE-A972-F5545C993903}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9484DFDB-00C7-46EE-A972-F5545C993903}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {62D57080-14D4-4415-9912-F13F74250D8A}
 	EndGlobalSection
 EndGlobal

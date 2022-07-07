@@ -1,32 +1,32 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 using TECHIS.Cloud.AzureStorage;
 using System.Linq;
 using System.Threading;
+using Xunit;
 
 namespace Test.Cloud.AzureStorage
 {
-    [TestClass]
+
     public class TestBlobLeaseAgent
     {
-
-        [TestMethod]
+        [Fact]
         public async Task TestAcquireLease()
         {
-            string errorMessage = null;
+            string? errorMessage = null;
             string leaseName = "testleasesc3";
             int durationSeconds = 15;
 
             BlobLeaseAgent bla = (new BlobLeaseAgent(leaseName, durationSeconds)).Connect(Connector.GetContainerUri());
 
-            string leaseId = null;
+            string? leaseId = null;
             using (var cts = new CancellationTokenSource())
             {
                 try
                 {
-                    leaseId = bla?.AcquireLeaseAsync(cts.Token).Result;
+                    leaseId = bla.AcquireLeaseAsync(cts.Token).Result;
                 }
                 catch (Exception xc)
                 {
@@ -36,8 +36,8 @@ namespace Test.Cloud.AzureStorage
 
             bool hasLease = !string.IsNullOrEmpty(leaseId);
 
-            Assert.IsTrue(string.IsNullOrEmpty(errorMessage), $"has error:{Environment.NewLine}{errorMessage}");
-            Assert.IsTrue(hasLease, "Lease was not acquired");
+            Assert.True(string.IsNullOrEmpty(errorMessage), $"has error:{Environment.NewLine}{errorMessage}");
+            Assert.True(hasLease, "Lease was not acquired");
 
             if (hasLease)
             {
@@ -45,17 +45,17 @@ namespace Test.Cloud.AzureStorage
                await task;
             }
         }
-        [TestMethod]
+        [Fact]
         public void TestReAcquireLease()
         {
-            string errorMessage = null;
+            string? errorMessage = null;
             string leaseName = "testleasesc3";
             int durationSeconds = 22;
             int renewCount = 3;
 
             BlobLeaseAgent bla = (new BlobLeaseAgent(leaseName, durationSeconds)).Connect(Connector.GetContainerUri());
 
-            string leaseId = null;
+            string? leaseId = null;
             using (var cts = new CancellationTokenSource())
             {
                 try
@@ -69,39 +69,39 @@ namespace Test.Cloud.AzureStorage
 
                 for (int i = 0; i < renewCount; i++)
                 {
-                    leaseId = bla.AcquireLeaseAsync(cts.Token, durationSeconds, leaseId).Result;
+                    leaseId = bla?.AcquireLeaseAsync(cts.Token, durationSeconds, leaseId).Result;
                     Thread.Sleep((durationSeconds - 5) * 1000);
                 }
             }
 
             bool hasLease = !string.IsNullOrEmpty(leaseId);
 
-            Assert.IsTrue(string.IsNullOrEmpty(errorMessage));
-            Assert.IsTrue(hasLease);
+            Assert.True(string.IsNullOrEmpty(errorMessage));
+            Assert.True(hasLease);
 
             if (hasLease)
             {
-                bla.ReleaseLeaseAsync(leaseId).Wait();
+                bla?.ReleaseLeaseAsync(leaseId).Wait();
             }
         }
 
 
 
-        [TestMethod]
+        [Fact]
         public async Task TestAcquireLeaseAsync()
         {
-            string errorMessage = null;
+            string? errorMessage = null;
             string leaseName = "testleasesc4";
             int durationSeconds = 15;
 
             BlobLeaseAgent bla = await (new BlobLeaseAgent(leaseName, durationSeconds)).ConnectAsync(Connector.GetContainerUri());
 
-            string leaseId = null;
+            string? leaseId = null;
             using (var cts = new CancellationTokenSource())
             {
                 try
                 {
-                    leaseId = await bla?.AcquireLeaseAsync(cts.Token);
+                    leaseId = await bla.AcquireLeaseAsync(cts.Token);
                 }
                 catch (Exception xc)
                 {
@@ -111,8 +111,8 @@ namespace Test.Cloud.AzureStorage
 
             bool hasLease = !string.IsNullOrEmpty(leaseId);
 
-            Assert.IsTrue(string.IsNullOrEmpty(errorMessage), $"has error:{Environment.NewLine}{errorMessage}");
-            Assert.IsTrue(hasLease, "Lease was not acquired");
+            Assert.True(string.IsNullOrEmpty(errorMessage), $"has error:{Environment.NewLine}{errorMessage}");
+            Assert.True(hasLease, "Lease was not acquired");
 
             if (hasLease)
             {
@@ -120,22 +120,22 @@ namespace Test.Cloud.AzureStorage
                
             }
         }
-        [TestMethod]
+        [Fact]
         public async Task TestReAcquireLeaseAsync()
         {
-            string errorMessage = null;
+            string? errorMessage = null;
             string leaseName = "testleasesc4";
             int durationSeconds = 22;
             int renewCount = 3;
 
             BlobLeaseAgent bla = await (new BlobLeaseAgent(leaseName, durationSeconds)).ConnectAsync(Connector.GetContainerUri());
 
-            string leaseId = null;
+            string? leaseId = null;
             using (var cts = new CancellationTokenSource())
             {
                 try
                 {
-                    leaseId = await bla?.AcquireLeaseAsync(cts.Token);
+                    leaseId = await bla.AcquireLeaseAsync(cts.Token);
                 }
                 catch (Exception xc)
                 {
@@ -151,8 +151,8 @@ namespace Test.Cloud.AzureStorage
 
             bool hasLease = !string.IsNullOrEmpty(leaseId);
 
-            Assert.IsTrue(string.IsNullOrEmpty(errorMessage));
-            Assert.IsTrue(hasLease);
+            Assert.True(string.IsNullOrEmpty(errorMessage));
+            Assert.True(hasLease);
 
             if (hasLease)
             {

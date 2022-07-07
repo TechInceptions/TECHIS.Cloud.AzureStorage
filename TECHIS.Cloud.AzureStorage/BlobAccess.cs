@@ -4,9 +4,11 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Blob;
-using Microsoft.WindowsAzure.Storage.RetryPolicies;
+using Azure;
+using Azure.Core;
+using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
+using Azure.Storage.Blobs.Specialized;
 using TECHIS.Core;
 
 namespace TECHIS.Cloud.AzureStorage
@@ -14,11 +16,13 @@ namespace TECHIS.Cloud.AzureStorage
     public abstract class BlobAccess
     {
         #region Fields 
-        private readonly LinearRetry        _DefaultLinearRetry = new LinearRetry(new TimeSpan(0, 0, 3), 3);
-        private readonly BlobRequestOptions _DefaultBlobRequestOptions;
+        //private readonly RetryOptions _DefaultLinearRetry = new RetryOptions(null) { Mode= RetryMode.Fixed };  //new LinearRetry(new TimeSpan(0, 0, 3), 3);
+        //private readonly BlobRequestOptions _DefaultBlobRequestOptions;
         private ConnectionSettings          _ConnectionSettings;
-        private CloudBlobClient             _BlobClient;
-        private CloudStorageAccount         _StorageAccount;
+        private BlobServiceClient _BlobClient;
+        private string _ConnectionString;
+
+        //private CloudStorageAccount         _StorageAccount;
         private bool                        _IsAccountValid;
         private bool                        _IsClientValid;
         //private Encoding                    _Encoding = Encoding.UTF8;
@@ -26,17 +30,11 @@ namespace TECHIS.Cloud.AzureStorage
 
         public BlobAccess()
         {
-            _DefaultBlobRequestOptions = new BlobRequestOptions { RetryPolicy = _DefaultLinearRetry };
+            //_DefaultBlobRequestOptions = new BlobRequestOptions { RetryPolicy = _DefaultLinearRetry };
         }
 
         #region Properties  
-        protected virtual CloudStorageAccount StorageAccount
-        {
-            get
-            {
-                return _StorageAccount;
-            }
-        }
+
 
         public bool IsAccountValid
         {
@@ -69,7 +67,7 @@ namespace TECHIS.Cloud.AzureStorage
             protected set;
         }
 
-        protected virtual CloudBlobContainer BlobContainer
+        protected virtual BlobContainerClient BlobContainer
         {
             get;
             private set;
@@ -83,21 +81,21 @@ namespace TECHIS.Cloud.AzureStorage
             }
         }
 
-        public virtual LinearRetry DefaultLinearRetry
-        {
-            get
-            {
-                return _DefaultLinearRetry;
-            }
-        }
+        //public virtual LinearRetry DefaultLinearRetry
+        //{
+        //    get
+        //    {
+        //        return _DefaultLinearRetry;
+        //    }
+        //}
 
-        public virtual BlobRequestOptions DefaultBlobRequestOptions
-        {
-            get
-            {
-                return _DefaultBlobRequestOptions;
-            }
-        }
+        //public virtual BlobRequestOptions DefaultBlobRequestOptions
+        //{
+        //    get
+        //    {
+        //        return _DefaultBlobRequestOptions;
+        //    }
+        //}
 
         public virtual Encoding Encoding { get; protected set; } = Encoding.UTF8;
         #endregion
@@ -107,7 +105,7 @@ namespace TECHIS.Cloud.AzureStorage
         {
             if (IsAccountValid)
             {
-                _BlobClient = StorageAccount.CreateCloudBlobClient();
+                _BlobClient = new BlobServiceClient(_ConnectionString);
                 _IsClientValid = true;
             }
             else
@@ -129,10 +127,10 @@ namespace TECHIS.Cloud.AzureStorage
             {
 
                 // Retrieve a reference to a container.
-                BlobContainer = _BlobClient.GetContainerReference(ConnectionSettings.ContainerName);
+                BlobContainer = _BlobClient.GetBlobContainerClient(ConnectionSettings.ContainerName);
 
                 // Create the container if it doesn't already exist.
-                Task.Run(() => BlobContainer.CreateIfNotExistsAsync()).Wait();
+                 BlobContainer.CreateIfNotExists();
                 IsValidContainer = true;
             }
 
@@ -149,15 +147,17 @@ namespace TECHIS.Cloud.AzureStorage
             {
 
                 // Retrieve a reference to a container.
-                BlobContainer = _BlobClient.GetContainerReference(ConnectionSettings.ContainerName);
+                BlobContainer = _BlobClient.GetBlobContainerClient(ConnectionSettings.ContainerName);
 
                 // Create the container if it doesn't already exist.
                 await BlobContainer.CreateIfNotExistsAsync();
+
                 IsValidContainer = true;
             }
 
             return IsValidContainer;
         }
+
         #endregion
 
         #region Public Methods 
@@ -188,7 +188,8 @@ namespace TECHIS.Cloud.AzureStorage
 
                 if (!string.IsNullOrEmpty(_ConnectionSettings.AzureStorageConnectionString))
                 {
-                    _StorageAccount = CloudStorageAccount.Parse(_ConnectionSettings.AzureStorageConnectionString);
+                    //_StorageAccount = CloudStorageAccount.Parse(_ConnectionSettings.AzureStorageConnectionString);
+                    _ConnectionString = _ConnectionSettings.AzureStorageConnectionString;
                     _IsAccountValid = true;
                 }
             }
@@ -274,8 +275,6 @@ namespace TECHIS.Cloud.AzureStorage
         /// After reset is called, you will need to call Connect to re-connect to the store.
         /// </summary>
         protected virtual void Reset() {
-
-            _StorageAccount = null;
             _IsAccountValid = false;
             _ConnectionSettings = null;
         }
@@ -291,7 +290,7 @@ namespace TECHIS.Cloud.AzureStorage
                 }
                 if (!string.IsNullOrEmpty(containerUri))
                 {
-                    BlobContainer               = new CloudBlobContainer(new Uri(containerUri));
+                    BlobContainer               = new BlobContainerClient(new Uri(containerUri)); // CloudBlobContainer(new Uri(containerUri));
                     success                     = true;
                     IsValidContainer            = true;
                 }
@@ -306,9 +305,9 @@ namespace TECHIS.Cloud.AzureStorage
         }
 
 
-        protected CloudBlockBlob GetBlockBlob(string blobFileName)
+        protected BlobClient GetBlockBlob(string blobFileName)
         {
-            return BlobContainer.GetBlockBlobReference(blobFileName);
+            return BlobContainer.GetBlobClient(blobFileName);
         }
         #endregion
 
