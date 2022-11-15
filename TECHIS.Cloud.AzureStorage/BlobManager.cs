@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Azure;
+using Azure.Core;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
@@ -15,15 +16,15 @@ namespace TECHIS.Cloud.AzureStorage
 
         #region Connection Methods 
 
-        public new BlobManager Connect(string containerUri, Encoding encoding = null)
+        public new BlobManager Connect(string containerUri, Encoding encoding = null, TokenCredential tokenCredential = null)
         {
-            base.Connect(containerUri, encoding);
+            base.Connect(containerUri, encoding, tokenCredential);
             return this;
         }
 
-        public new BlobManager Connect(string azureStorageConnectionString, string containerName, Encoding encoding = null)
+        public new BlobManager Connect(string azureStorageConnectionString, string containerName, Encoding encoding = null, TokenCredential tokenCredential = null)
         {
-            base.Connect(azureStorageConnectionString, containerName, encoding);
+            base.Connect(azureStorageConnectionString, containerName, encoding, tokenCredential);
             return this;
         }
 

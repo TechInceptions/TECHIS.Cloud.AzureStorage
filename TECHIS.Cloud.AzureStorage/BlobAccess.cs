@@ -16,21 +16,18 @@ namespace TECHIS.Cloud.AzureStorage
     public abstract class BlobAccess
     {
         #region Fields 
-        //private readonly RetryOptions _DefaultLinearRetry = new RetryOptions(null) { Mode= RetryMode.Fixed };  //new LinearRetry(new TimeSpan(0, 0, 3), 3);
-        //private readonly BlobRequestOptions _DefaultBlobRequestOptions;
+
         private ConnectionSettings          _ConnectionSettings;
         private BlobServiceClient _BlobClient;
         private string _ConnectionString;
 
-        //private CloudStorageAccount         _StorageAccount;
         private bool                        _IsAccountValid;
         private bool                        _IsClientValid;
-        //private Encoding                    _Encoding = Encoding.UTF8;
         #endregion
 
         public BlobAccess()
         {
-            //_DefaultBlobRequestOptions = new BlobRequestOptions { RetryPolicy = _DefaultLinearRetry };
+
         }
 
         #region Properties  
@@ -81,22 +78,6 @@ namespace TECHIS.Cloud.AzureStorage
             }
         }
 
-        //public virtual LinearRetry DefaultLinearRetry
-        //{
-        //    get
-        //    {
-        //        return _DefaultLinearRetry;
-        //    }
-        //}
-
-        //public virtual BlobRequestOptions DefaultBlobRequestOptions
-        //{
-        //    get
-        //    {
-        //        return _DefaultBlobRequestOptions;
-        //    }
-        //}
-
         public virtual Encoding Encoding { get; protected set; } = Encoding.UTF8;
         #endregion
 
@@ -105,7 +86,16 @@ namespace TECHIS.Cloud.AzureStorage
         {
             if (IsAccountValid)
             {
-                _BlobClient = new BlobServiceClient(_ConnectionString);
+                if (_ConnectionSettings?.TokenCredential != null)
+                {
+
+                    _BlobClient = new BlobServiceClient(new Uri(_ConnectionString), _ConnectionSettings.TokenCredential);
+                }
+                else
+                {
+                    _BlobClient = new BlobServiceClient(_ConnectionString);
+                }
+
                 _IsClientValid = true;
             }
             else
@@ -162,10 +152,19 @@ namespace TECHIS.Cloud.AzureStorage
 
         #region Public Methods 
 
-        protected virtual void Connect(string containerUri, Encoding encoding = null)
+        /*
+         * 
+ // When deployed to an azure host, the default azure credential will authenticate the specified user assigned managed identity.
+
+string userAssignedClientId = "<your managed identity client Id>";
+var credential = new DefaultAzureCredential(new DefaultAzureCredentialOptions { ManagedIdentityClientId = userAssignedClientId });
+
+var blobClient = new BlobClient(new Uri("https://myaccount.blob.core.windows.net/mycontainer/myblob"), credential);
+         */
+        protected virtual void Connect(string containerUri, Encoding encoding = null, TokenCredential tokenCredential = null)
         {
             InputValidator.ArgumentNullOrEmptyCheck(containerUri, nameof(containerUri));
-            _ConnectionSettings = new ConnectionSettings { AzureContainerUriWithSas = containerUri };
+            _ConnectionSettings = new ConnectionSettings { AzureContainerUriWithSas = containerUri, TokenCredential = tokenCredential };
             _IsAccountValid = false;
 
             if (encoding!=null)
@@ -174,7 +173,7 @@ namespace TECHIS.Cloud.AzureStorage
             }
         }
 
-        protected virtual void Connect(string azureStorageConnectionString, string containerName, Encoding encoding = null)
+        protected virtual void Connect(string azureStorageConnectionString, string containerName, Encoding encoding = null, TokenCredential tokenCredential = null)
         {
             InputValidator.ArgumentNullOrEmptyCheck(azureStorageConnectionString, nameof(azureStorageConnectionString));      
                  
@@ -184,11 +183,10 @@ namespace TECHIS.Cloud.AzureStorage
             } 
             try
             {
-                _ConnectionSettings = new ConnectionSettings { AzureStorageConnectionString = azureStorageConnectionString, ContainerName=containerName };
+                _ConnectionSettings = new ConnectionSettings { AzureStorageConnectionString = azureStorageConnectionString, ContainerName=containerName, TokenCredential = tokenCredential };
 
                 if (!string.IsNullOrEmpty(_ConnectionSettings.AzureStorageConnectionString))
                 {
-                    //_StorageAccount = CloudStorageAccount.Parse(_ConnectionSettings.AzureStorageConnectionString);
                     _ConnectionString = _ConnectionSettings.AzureStorageConnectionString;
                     _IsAccountValid = true;
                 }
@@ -290,7 +288,7 @@ namespace TECHIS.Cloud.AzureStorage
                 }
                 if (!string.IsNullOrEmpty(containerUri))
                 {
-                    BlobContainer               = new BlobContainerClient(new Uri(containerUri)); // CloudBlobContainer(new Uri(containerUri));
+                    BlobContainer = ConnectionSettings.TokenCredential == null ? new BlobContainerClient(new Uri(containerUri)) : new BlobContainerClient(new Uri(containerUri), ConnectionSettings.TokenCredential); 
                     success                     = true;
                     IsValidContainer            = true;
                 }

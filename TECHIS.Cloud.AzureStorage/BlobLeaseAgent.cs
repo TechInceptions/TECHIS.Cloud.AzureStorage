@@ -9,6 +9,7 @@ using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
 using System.Text;
+using Azure.Core;
 
 namespace TECHIS.Cloud.AzureStorage
 {
@@ -32,18 +33,18 @@ namespace TECHIS.Cloud.AzureStorage
             return this;
         }
 
-        public async Task<BlobLeaseAgent> ConnectAsync(string azureStorageConnectionString, string containerName, Encoding encoding = null)
+        public async Task<BlobLeaseAgent> ConnectAsync(string azureStorageConnectionString, string containerName, Encoding encoding = null, TokenCredential tokenCredential = null)
         {
-            base.Connect(azureStorageConnectionString, containerName, encoding);
+            base.Connect(azureStorageConnectionString, containerName, encoding, tokenCredential);
             if (await EnsureContainerAsync())
             {
                 _LeaseBlob = BlobContainer.GetPageBlobClient(_LeaseBlobName);
             }
             return this;
         }
-        public new BlobLeaseAgent Connect(string containerUri, Encoding encoding = null)
+        public new BlobLeaseAgent Connect(string containerUri, Encoding encoding = null, TokenCredential tokenCredential = null)
         {
-            base.Connect(containerUri, encoding);
+            base.Connect(containerUri, encoding, tokenCredential);
             if (EnsureContainer())
             {
                 _LeaseBlob = BlobContainer.GetPageBlobClient(_LeaseBlobName);
@@ -51,9 +52,9 @@ namespace TECHIS.Cloud.AzureStorage
             return this;
         }
 
-        public new BlobLeaseAgent Connect(string azureStorageConnectionString, string containerName, Encoding encoding = null)
+        public new BlobLeaseAgent Connect(string azureStorageConnectionString, string containerName, Encoding encoding = null, TokenCredential tokenCredential = null)
         {
-            base.Connect(azureStorageConnectionString, containerName, encoding);
+            base.Connect(azureStorageConnectionString, containerName, encoding, tokenCredential);
             if (EnsureContainer())
             {
                 _LeaseBlob = BlobContainer.GetPageBlobClient(_LeaseBlobName);

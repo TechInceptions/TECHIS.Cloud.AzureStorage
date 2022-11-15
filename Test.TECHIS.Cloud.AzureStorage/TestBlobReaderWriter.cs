@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Azure.Identity;
+using System;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -10,6 +11,7 @@ namespace Test.Cloud.AzureStorage
     
     public class TestBlobReaderWriter
     {
+        private static DefaultAzureCredential _credential = new DefaultAzureCredential();
         [Fact]
         public void ReadText()
         {
@@ -18,9 +20,23 @@ namespace Test.Cloud.AzureStorage
             Assert.False(string.IsNullOrEmpty(data), "Failed to read blob file");
         }
         [Fact]
+        public void ReadText2()
+        {
+            string data = (new BlobReader()).Connect(Connector.ADControlledContainerUrl,null,_credential).ReadText(FixedFileName);
+
+            Assert.False(string.IsNullOrEmpty(data), "Failed to read blob file");
+        }
+        [Fact]
         public void ReadTextNoFile()
         {
             string data = (new BlobReader()).Connect(Connector.GetContainerUri()).ReadText(NonExistingFileName);
+
+            Assert.True(string.IsNullOrEmpty(data));
+        }
+        [Fact]
+        public void ReadTextNoFile2()
+        {
+            string data = (new BlobReader()).Connect(Connector.ADControlledContainerUrl, null, _credential).ReadText(NonExistingFileName);
 
             Assert.True(string.IsNullOrEmpty(data));
         }
@@ -36,6 +52,19 @@ namespace Test.Cloud.AzureStorage
 
             //Assert.False(string.IsNullOrEmpty(data), "Failed to read blob file");
         }
+
+        [Fact]
+        public void WriteText2()
+        {
+            BlobWriter br = new BlobWriter();
+            var containerUri = Connector.ADControlledContainerUrl;
+            var fileName = "l1/l3";
+            byte[] data = System.Text.Encoding.UTF8.GetBytes("Test data");
+            br.Connect(containerUri,null,_credential).WriteToBlob(data, fileName);
+
+            //Assert.False(string.IsNullOrEmpty(data), "Failed to read blob file");
+        }
+
         [Fact]
         public void ReadTextAsync()
         {
@@ -113,7 +142,7 @@ namespace Test.Cloud.AzureStorage
             BlobWriter br = new BlobWriter();
             string containerUri = Connector.GetContainerUri();
             var fileName = "l1/l3";
-            byte[] data = System.Text.Encoding.UTF8.GetBytes($"Test data: {DateTime.UtcNow.ToString() }");
+            byte[] data = System.Text.Encoding.UTF8.GetBytes($"Test data: {DateTime.UtcNow}");
             var task = br.Connect(containerUri).WriteToBlobAsync(data, fileName);
            await task;
             Assert.True(task.IsCompleted, "Failed to Write Async blob file");
@@ -123,8 +152,19 @@ namespace Test.Cloud.AzureStorage
         {
             BlobWriter br = new BlobWriter();
             var fileName = "l1/l3";
-            byte[] data = System.Text.Encoding.UTF8.GetBytes($"Test data: {DateTime.UtcNow.ToString()}");
+            byte[] data = System.Text.Encoding.UTF8.GetBytes($"Test data: {DateTime.UtcNow}");
             var task = br.Connect(Connector.StorageConnectionString, "test").WriteToBlobAsync(data, fileName);
+            await task;
+            Assert.True(task.IsCompleted, "Failed to Write Async blob file");
+        }
+
+        [Fact]
+        public async Task WriteTextAsync3()
+        {
+            BlobWriter br = new BlobWriter();
+            var fileName = "l1/l3";
+            byte[] data = System.Text.Encoding.UTF8.GetBytes($"Test data: {DateTime.UtcNow}");
+            var task = br.Connect(Connector.ADControlledStorage, "test", null, _credential).WriteToBlobAsync(data, fileName);
             await task;
             Assert.True(task.IsCompleted, "Failed to Write Async blob file");
         }
