@@ -11,6 +11,9 @@ namespace Test.Cloud.AzureStorage
     {
 
         private static DefaultSecretStore _defaultSecretStore = new DefaultSecretStore("https://techis-proj-azurestorage.vault.azure.net/");
+        internal static string ADControlledStorage = "https://techis4devad.blob.core.windows.net";
+        internal static string ADControlledContainerUrl = "https://techis4devad.blob.core.windows.net/cloudfile";
+
         public static string GetContainerUri() => _defaultSecretStore.GetSecret("ContainerUri");
 
         /// <summary>

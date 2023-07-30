@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <Description>Simple API for Azure Storage</Description>
-    <Version>1.0.1</Version>
+    <Version>2.0.0</Version>
     <PackageReleaseNotes>Updated packages</PackageReleaseNotes>
     <Authors>TECH-IS, Arinze</Authors>
     <Company>TECH-IS INC.</Company>
@@ -14,16 +14,17 @@
     <PackageTags>Azure Storage File API Simple Techis</PackageTags>
     <Product>SAFAS: Simple API for Azure Storage</Product>
     <RepositoryType>Git</RepositoryType>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <FileVersion>1.0.0.0</FileVersion>
+    <AssemblyVersion>2.0.0.0</AssemblyVersion>
+    <FileVersion>2.0.0.0</FileVersion>
     <PackageOutputPath>C:\Data\PackageRepo</PackageOutputPath>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Azure.Storage.Blobs" Version="12.12.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.17.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="System.Net.Requests" Version="4.3.0" />
-    <PackageReference Include="TECHIS.Core" Version="5.0.0" />
+    <PackageReference Include="TECHIS.CloudFile" Version="2.0.0" />
+    <PackageReference Include="TECHIS.Core" Version="5.1.1" />
   </ItemGroup>
 
 </Project>

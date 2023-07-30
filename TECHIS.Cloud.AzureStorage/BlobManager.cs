@@ -4,26 +4,28 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Azure;
+using Azure.Core;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
+using TECHIS.CloudFile;
 
 namespace TECHIS.Cloud.AzureStorage
 {
-    public class BlobManager:BlobAccess
+    public class BlobManager : BlobAccess, ICloudFileManager
     {
 
         #region Connection Methods 
 
-        public new BlobManager Connect(string containerUri, Encoding encoding = null)
+        public new BlobManager Connect(string containerUri, Encoding encoding = null, TokenCredential tokenCredential = null)
         {
-            base.Connect(containerUri, encoding);
+            base.Connect(containerUri, encoding, tokenCredential);
             return this;
         }
 
-        public new BlobManager Connect(string azureStorageConnectionString, string containerName, Encoding encoding = null)
+        public new BlobManager Connect(string azureStorageConnectionString, string containerName, Encoding encoding = null, TokenCredential tokenCredential = null)
         {
-            base.Connect(azureStorageConnectionString, containerName, encoding);
+            base.Connect(azureStorageConnectionString, containerName, encoding, tokenCredential);
             return this;
         }
 
@@ -34,11 +36,11 @@ namespace TECHIS.Cloud.AzureStorage
             if (EnsureContainer())
                 GetBlockBlob(fileName).Delete();
         }
-        public async Task DeleteAsymc(string fileName)
-        {
-            if (await EnsureContainerAsync())
-                await GetBlockBlob(fileName).DeleteAsync(); 
-        }
+        //public async Task DeleteAsymc(string fileName)
+        //{
+        //    if (await EnsureContainerAsync())
+        //        await GetBlockBlob(fileName).DeleteAsync(); 
+        //}
 
         public async Task DeleteAsync(string fileName)
         {
@@ -54,29 +56,51 @@ namespace TECHIS.Cloud.AzureStorage
         /// s: Returns all blobs in this container whose names begin with 's'.
         /// media/s: Returns all blobs in this container whose names begin with 'media/s'.
         /// </summary>
-        public async Task<string[]> ListAsync(string prefix=null)
+        public async Task<(string Name, DateTimeOffset? LastModified)[]> GetLastModifiedDatesAsync(string prefix = null)
         {
-            List<string> names = null;
-            if (await EnsureContainerAsync())
-            {
-                if (string.IsNullOrWhiteSpace(prefix) || (prefix.Length==1 && prefix[0]=='/'))
-                {
-                    prefix = null;
-                }
 
-                var pageable = BlobContainer.GetBlobsAsync(prefix: prefix);
-                var results = await GetListFromPageAsync(pageable);
+            List<(string Name, DateTimeOffset? LastModified)> names = (await GetPagedBlobs(prefix))
+                                                                        .Select(blobItem => (blobItem.Name, blobItem.Properties?.LastModified)).ToList();
 
-                names = results .Where(blobItem => (blobItem.IsLatestVersion==null || blobItem.IsLatestVersion.Value) && !blobItem.Deleted)
-                                .Select(blobItem => blobItem.Name).ToList();
-            }
-            if (names==null)
-            {
-                names = new List<string>(0);
-            }
+            return names?.ToArray() ?? Array.Empty<(string Name, DateTimeOffset? LastModified)>();
 
-            return names.ToArray();
         }
+
+        /// <summary>
+        /// Initiates an asynchronous operation to return a list of names of blob items in the container.
+        /// Parameter containerPath must include the complete name of an existing container in the account and a forward slash (/) at a minimum. containerPath may optionally include the blob name prefix as well.
+        /// Here are some examples of valid prefixes:
+        /// /: Returns all blobs in this container.
+        /// s: Returns all blobs in this container whose names begin with 's'.
+        /// media/s: Returns all blobs in this container whose names begin with 'media/s'.
+        /// </summary>
+        public async Task<string[]> ListAsync(string prefix = null)
+        {
+
+            var names = (await GetPagedBlobs(prefix)).Select(blobItem => blobItem.Name).ToList();
+
+            return names?.ToArray() ?? Array.Empty<string>();
+
+        }
+
+        private async Task<IEnumerable<BlobItem>> GetPagedBlobs(string prefix)
+        {
+
+            if (!(await EnsureContainerAsync()))
+            {
+                return Array.Empty<BlobItem>();
+            }
+
+            if (string.IsNullOrWhiteSpace(prefix) || (prefix.Length == 1 && prefix[0] == '/'))
+            {
+                prefix = null;
+            }
+
+            return (await GetListFromPageAsync(BlobContainer.GetBlobsAsync(prefix: prefix)).ConfigureAwait(false))
+                .Where(blobItem => blobItem != null)
+                .Where(blobItem => (blobItem.IsLatestVersion == null || blobItem.IsLatestVersion.Value) && !blobItem.Deleted);
+        }
+
         /// <summary>
         /// Initiates an asynchronous operation to return a list of names of blob items in the container.
         /// Parameter containerPath must include the complete name of an existing container in the account and a forward slash (/) at a minimum. containerPath may optionally include the blob name prefix as well.
@@ -88,7 +112,7 @@ namespace TECHIS.Cloud.AzureStorage
         public string[] List(string prefix = null)
         {
             List<string> names = null;
-            if ( EnsureContainer())
+            if (EnsureContainer())
             {
                 if (string.IsNullOrWhiteSpace(prefix) || (prefix.Length == 1 && prefix[0] == '/'))
                 {
@@ -138,7 +162,7 @@ namespace TECHIS.Cloud.AzureStorage
             var enumerator = asyncPageable.GetEnumerator();
             try
             {
-                while ( enumerator.MoveNext())
+                while (enumerator.MoveNext())
                 {
                     allInstances.Add(enumerator.Current);
                 }
@@ -151,7 +175,7 @@ namespace TECHIS.Cloud.AzureStorage
         }
         private string GetFileNameFromBlobURI(Uri blobUri)
         {
-            var containerName = BlobContainer.Name; 
+            var containerName = BlobContainer.Name;
             string theFile = blobUri.ToString();
             int dirIndex = theFile.IndexOf(containerName);
             return theFile.Substring(dirIndex + containerName.Length + 1, theFile.Length - (dirIndex + containerName.Length + 1));

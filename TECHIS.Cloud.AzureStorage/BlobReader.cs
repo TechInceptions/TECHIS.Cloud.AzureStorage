@@ -1,32 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
+﻿//using Microsoft.Azure;
+using Azure;
+using Azure.Core;
+using Azure.Storage.Blobs;
+using System;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-//using Microsoft.Azure;
-using Azure;
-using Azure.Storage.Blobs;
-using Azure.Storage.Blobs.Models;
-using Azure.Storage.Blobs.Specialized;
+using TECHIS.CloudFile;
 
 
 namespace TECHIS.Cloud.AzureStorage
 {
-    public class BlobReader:BlobAccess
+    public class BlobReader:BlobAccess,ICloudFileReader
     {
         #region Public Methods 
 
-        public new BlobReader Connect(string containerUri, Encoding encoding = null)
+        public new BlobReader Connect(string containerUri, Encoding encoding = null, TokenCredential tokenCredential = null)
         {
-            base.Connect(containerUri, encoding);
+            base.Connect(containerUri, encoding, tokenCredential);
             return this;
         }
 
-        public new BlobReader Connect(string azureStorageConnectionString, string containerName, Encoding encoding = null)
+        public new BlobReader Connect(string azureStorageConnectionString, string containerName, Encoding encoding = null, TokenCredential tokenCredential = null)
         {
-            base.Connect(azureStorageConnectionString, containerName, encoding);
+            base.Connect(azureStorageConnectionString, containerName, encoding,tokenCredential);
             return this;
         }
 
