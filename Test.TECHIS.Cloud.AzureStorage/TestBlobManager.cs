@@ -11,22 +11,40 @@ namespace Test.Cloud.AzureStorage
     
     public class TestBlobManager
     {
-        //[Fact]
-        //public async Task TestDelete()
-        //{
-        //    string path = "ForDelete";
-        //    WriteTextFile(path);
-        //    var list = await ListFilesAsync(path);
 
-        //    Assert.NotNull(list);
-        //    Assert.NotEmpty(list);
+        [Fact]
+        public async Task TestGetLastModifiedContainerRootAsync()
+        {
+            string? path = null;
+            var list = await ConnectedManager.GetLastModifiedDatesAsync(path);
 
-        //    var initial1st = list[0];
-        //    await ConnectedManager.DeleteAsync(initial1st);
+            Assert.NotNull(list);
+            Assert.NotEmpty(list);
+        }
 
-        //    var postList = await ListFilesAsync(path);
-        //    Assert.Empty(postList);
-        //}
+        [Fact]
+        public async Task TestGetLastModifiedContainerChildAsync()
+        {
+            string path = "PackageRepo";
+            var list = await ConnectedManager.GetLastModifiedDatesAsync(path);
+
+
+            Assert.NotNull(list);
+            Assert.NotEmpty(list);
+            Assert.True(list.All(p => p.Name.Contains($"{path}/")), "failed to list only items in child folder");
+        }
+
+        [Fact]
+        public async Task TestGetLastModifiedContainerSubChildAsync()
+        {
+            string path = "Samples/graphics/graphics";
+            var list = await ConnectedManager.GetLastModifiedDatesAsync(path);
+
+            Assert.NotNull(list);
+            Assert.NotEmpty(list);
+            Assert.True(list.All(p => p.Name.Contains($"{path}/")), "failed to list only items in child folder");
+        }
+
 
         [Fact]
         public async Task TestListContainerRootAsync()

@@ -20,10 +20,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Azure.Storage.Blobs" Version="12.14.1" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.17.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="System.Net.Requests" Version="4.3.0" />
-    <PackageReference Include="TECHIS.Core" Version="5.0.0" />
+    <PackageReference Include="TECHIS.CloudFile" Version="2.0.0" />
+    <PackageReference Include="TECHIS.Core" Version="5.1.1" />
   </ItemGroup>
 
 </Project>

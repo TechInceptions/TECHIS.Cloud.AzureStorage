@@ -1,21 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-//using Microsoft.Azure;
+﻿//using Microsoft.Azure;
 using Azure;
 using Azure.Core;
 using Azure.Storage.Blobs;
-using Azure.Storage.Blobs.Models;
-using Azure.Storage.Blobs.Specialized;
+using System;
+using System.IO;
+using System.Net;
+using System.Text;
+using System.Threading.Tasks;
+using TECHIS.CloudFile;
 
 
 namespace TECHIS.Cloud.AzureStorage
 {
-    public class BlobReader:BlobAccess
+    public class BlobReader:BlobAccess,ICloudFileReader
     {
         #region Public Methods 
 

@@ -1,20 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿//using Microsoft.Azure;
+using Azure.Core;
+using System;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-//using Microsoft.Azure;
-using Azure;
-using Azure.Core;
-using Azure.Storage.Blobs;
-using Azure.Storage.Blobs.Models;
-using Azure.Storage.Blobs.Specialized;
+using TECHIS.CloudFile;
 
 
 namespace TECHIS.Cloud.AzureStorage
 {
-    public class BlobWriter:BlobAccess
+    public class BlobWriter:BlobAccess,ICloudFileWriter
     {
         #region Public Methods 
 
