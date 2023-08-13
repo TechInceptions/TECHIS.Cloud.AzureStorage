@@ -111,6 +111,40 @@ namespace Test.Cloud.AzureStorage
             Assert.True(list.All(p => p.Contains($"{path}/")), "failed to list only items in child folder");
         }
 
+        [Fact]
+        public void TestFileExists()
+        {
+            string path = "Samples/graphics/graphics/icons/masthead.jpg";
+            var list = ConnectedManager.List(path);
+
+            Assert.NotNull(list);
+            Assert.NotEmpty(list);
+            Assert.Collection(list, p => Assert.Equal(path, p));
+
+        }
+
+        [Fact]
+        public async Task TestFileExistsAsync()
+        {
+            string path = "Samples/graphics/graphics/icons/masthead.jpg";
+            var list = await ConnectedManager.ListAsync(path);
+
+            Assert.NotNull(list);
+            Assert.NotEmpty(list);
+            Assert.Collection(list, p => Assert.Equal(path, p));
+
+        }
+
+        [Fact]
+        public async Task TestFileNOTExistsAsync()
+        {
+            string path = "Samples/graphics/graphics/icons/146CBAAF64364C59A31F06186C7AAAEE.jpg";
+            var list = await ConnectedManager.ListAsync(path);
+
+            Assert.NotNull(list);
+            Assert.Empty(list);
+     
+        }
         private async Task<string[]> ListFilesAsync(string path)
         {
             return await ConnectedManager.ListAsync(path);
