@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Azure;
 using Azure.Core;
@@ -96,7 +97,7 @@ namespace TECHIS.Cloud.AzureStorage
                 prefix = null;
             }
 
-            return (await GetListFromPageAsync(BlobContainer.GetBlobsAsync(prefix: prefix)).ConfigureAwait(false))
+            return (await GetListFromPageAsync(BlobContainer.GetBlobsAsync(BlobTraits.None, BlobStates.None, prefix, CancellationToken.None)).ConfigureAwait(false))
                 .Where(blobItem => blobItem != null)
                 .Where(blobItem => (blobItem.IsLatestVersion == null || blobItem.IsLatestVersion.Value) && !blobItem.Deleted);
         }
@@ -119,7 +120,7 @@ namespace TECHIS.Cloud.AzureStorage
                     prefix = null;
                 }
 
-                var pageable = BlobContainer.GetBlobs(prefix: prefix);
+                var pageable = BlobContainer.GetBlobs(BlobTraits.None, BlobStates.None, prefix, CancellationToken.None);
                 var results = GetListFromPage(pageable);
 
                 //names = results.Where(blobItem => blobItem.IsLatestVersion != null && blobItem.IsLatestVersion.Value)
