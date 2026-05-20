@@ -1,11 +1,15 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
 	  <IncludeSymbols>true</IncludeSymbols>
 	  <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    <Deterministic>true</Deterministic>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <Description>Simple API for Azure Storage</Description>
-    <Version>3.0.1</Version>
+    <Version>3.0.3</Version>
     <PackageReleaseNotes>Exposed as CloudFile</PackageReleaseNotes>
     <Authors>TECH-IS, Arinze</Authors>
     <Company>TECH-IS INC.</Company>
@@ -20,14 +24,15 @@
   </PropertyGroup>
 
     <ItemGroup>
-	    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All"/>
+	    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.300" PrivateAssets="All"/>
     </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Azure.Storage.Blobs" Version="12.17.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.28.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageReference Include="System.Net.Http" Version="4.3.4" />
     <PackageReference Include="System.Net.Requests" Version="4.3.0" />
     <PackageReference Include="TECHIS.CloudFile" Version="2.0.0" />
-    <PackageReference Include="TECHIS.Core" Version="5.1.1" />
+    <PackageReference Include="TECHIS.Core" Version="6.0.3" />
   </ItemGroup>
 
 </Project>
