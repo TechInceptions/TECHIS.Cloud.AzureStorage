@@ -4,6 +4,10 @@
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
 	  <IncludeSymbols>true</IncludeSymbols>
 	  <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    <Deterministic>true</Deterministic>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <Description>Simple API for Azure Storage</Description>
     <Version>3.0.2</Version>
     <PackageReleaseNotes>Exposed as CloudFile</PackageReleaseNotes>
